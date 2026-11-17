@@ -8,102 +8,44 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
+# FixMate
 
-# FixMate — AI Developer & Context Guide (`agents.md`)
+Role-based on-demand repair platform. **The repo is still only the Next.js frontend scaffold** (`src/app/page.tsx` is create-next-app boilerplate). MongoDB, BetterAuth, Express, Stripe, ImgBB, Framer Motion, and DaisyUI/HeroUI are target design only — none are installed. Do not import them until they are added to `package.json`.
 
-## 1. Project Overview & Objective
-**FixMate** is a full-stack, role-based on-demand repair service platform built for smartphones, home appliances, and electronic devices. It connects customers with verified technicians, providing a transparent step-by-step job tracking pipeline and a secure "pay-after-service" model.
+## Verified stack
 
-* **Tech Stack:**
-  * **Frontend:** Next.js (App Router), TypeScript/JavaScript, Tailwind CSS, DaisyUI / HeroUI / shadcn/ui.
-  * **Backend:** Node.js, Express.js, TypeScript/JavaScript.
-  * **Database & Auth:** MongoDB, BetterAuth (with MongoDB adapter & custom additional fields), JWT.
-  * **Integrations:** Stripe Checkout & Webhook (Test Mode), ImgBB API (Image Uploads).
-  * **Motion & Styling Docs:** Refer to `theme.md` (Design & UI/UX Guidelines) and `animation.md` (Framer Motion & Micro-interactions).
+- Next.js 16.4.6 App Router, React 19.3, TypeScript strict, Tailwind CSS v4, React Compiler enabled (`next.config.ts`).
+- Import alias: `@/*` → `src/*`.
+- Package manager: npm (`package-lock.json`). Ignore the yarn/pnpm/bun commands in `README.md`.
+- No test runner, formatter, CI, or pre-commit config exists yet.
 
----
+## Commands
 
-## 2. Stakeholders & Roles
-1. **Customer (`customer`):** Browses/searches approved services, submits repair requests, tracks jobs, cancels unaccepted requests, pays via Stripe, and views transaction history.
-2. **Technician (`technician`):** Adds/manages repair services (subject to Admin approval), accepts/rejects incoming requests, advances job status, sets final billing amounts upon completion.
-3. **Admin (`admin`):** Moderates/approves service listings, manages user roles, monitors all platform bookings, reviews total revenue and transactions.
+- `npm run dev` — dev server on :3000. Also (re)writes the auto-generated block at the top of this file; commit it, don't delete it.
+- `npm run build` — production build; the main end-to-end verification.
+- `npm run lint` — `eslint` with no path, so it lints the whole repo. For one file: `npx eslint src/app/page.tsx`.
+- `npx tsc --noEmit` — typecheck (there is no `typecheck` script).
+- Tests: none configured. Don't invent `npm test`; run `npm run build` / `npx tsc --noEmit` instead.
 
----
+## Next.js 16 specifics
 
-## 3. Database Architecture (4 Core Collections)
-*Note: BetterAuth automatically manages its own session/account collections, but the user collection is extended using BetterAuth `additionalFields`.*
+- Installed Next.js is newer than most training data. Read `node_modules/next/dist/docs/01-app/01-getting-started/` (and the relevant API reference) before using unfamiliar APIs.
+- Route prop types are generated globally — e.g. `LayoutProps<"/">` in `src/app/layout.tsx`. Use the generated `PageProps<...>`/`LayoutProps<...>` helpers instead of hand-written params types.
+- Turbopack is the default dev/build bundler. `next.config.ts` routes `*.css` through `@tailwindcss/turbopack`; keep that rule or Tailwind styles break.
+- React Compiler is on: write plain components, don't add `useMemo`/`useCallback` reflexively, and follow the Rules of React.
 
-### A. `users` (Managed by BetterAuth + Admin)
-* `_id` (ObjectId)
-* `name` (String)
-* `email` (String, Unique)
-* `image` (String, ImgBB URL)
-* `role` (String: `'customer' | 'technician' | 'admin'`, default: `'customer'`)
-* `phone` (String)
-* `area` (String)
-* `bio` (String)
+## Styling
 
-### B. `services` (Managed by Technicians & Admin)
-* `_id` (ObjectId)
-* `title` (String)
-* `category` (String: `'Smartphone' | 'Laptop & PC' | 'AC' | 'Refrigerator' | 'TV' | 'Washing Machine' | 'Electrical'`)
-* `description` (String)
-* `image` (String, ImgBB URL)
-* `basePrice` (Number)
-* `estimatedDuration` (String)
-* `serviceMode` (String: `'Home Visit' | 'Shop Drop-off'`)
-* `serviceArea` (String)
-* `technicianName` & `technicianEmail` (String)
-* `approvalStatus` (String: `'pending' | 'approved' | 'rejected'`, default: `'pending'`)
-* `isAvailable` (Boolean, default: `true`)
-* `createdAt` (Date)
+- Tailwind v4 only: no `tailwind.config.*` and no PostCSS config. Tokens live in `src/app/globals.css` (`@import "tailwindcss"` + `@theme inline`); add new tokens there.
+- Fonts are loaded with `next/font`: Roboto is the main sans/heading font (`--font-roboto`), Roboto Mono is used for code (`--font-roboto-mono`).
+- `theme.md` is the source of truth for palette, card/button geometry, and status badge colors. `animation.md` defines motion variants.
+- `framer-motion` is not installed; install it before using `animation.md` snippets. Tailwind transitions work today.
+- `colorpalette.md` is for color palette .
 
-### C. `bookings` (Managed by Customers & Technicians)
-* `_id` (ObjectId)
-* `serviceId` (String)
-* `serviceTitle`, `serviceImage`, `category` (Snapshots from service)
-* `basePrice` (Number)
-* `technicianName`, `technicianEmail` (String)
-* `customerName`, `customerEmail`, `customerPhone` (String)
-* `address` (String)
-* `preferredDate` (Date)
-* `problemDescription` (String)
-* `status` (String: `'requested' | 'accepted' | 'rejected' | 'in-progress' | 'completed' | 'cancelled'`, default: `'requested'`)
-* `finalAmount` (Number, set upon completion)
-* `paymentStatus` (String: `'unpaid' | 'paid'`, default: `'unpaid'`)
+## Target domain model (planned, not implemented)
 
-### D. `payments` (Managed by Stripe Verification)
-* `_id` (ObjectId)
-* `bookingId` (String)
-* `serviceTitle` (String)
-* `customerName`, `customerEmail`, `technicianName`, `technicianEmail` (String)
-* `amount` (Number)
-* `currency` (String, `'usd'`)
-* `transactionId` & `stripeSessionId` (String, Unique)
-* `paymentStatus` (String, `'paid'`)
-* `paidAt` (Date)
-
----
-
-## 4. Job Status Pipeline & Business Rules
-* **`requested`** ➔ Can be **`accepted`** or **`rejected`** by the technician, or **`cancelled`** by the customer. (Final branch if rejected/cancelled).
-* **`accepted`** ➔ Can be moved to **`in-progress`** by the technician.
-* **`in-progress`** ➔ Can be marked **`completed`** by the technician (must include `finalAmount` > 0).
-* **`completed` + `unpaid`** ➔ Customer can initiate Stripe payment to transition to **`paid`**.
-
----
-
-## 5. Route Structure & Access Control
-* ** i will tell you 
-
----
-
-## 6. Security & Middlewares Guidelines
-
-* Frontend environment variables must be prefixed with appropriate keys ( `.env` for server secrets).
-
----
-
-## 7. Design System & Animation Integration
-* **UI/UX Design (`theme.md`):** Follow a classic, modern, and minimalist aesthetic. Maintain uniform card dimensions, clean neutral slates, royal blue primary buttons (`#2563EB`), and strict badge color standards across all dashboard roles.
-* **Motion & Animations (`animation.md`):** Utilize `framer-motion` for page fades, staggered grid entrances, and modal popups. Apply Tailwind transitions (`transition-all duration-300`) for smooth button hover states and card elevations.
+- Roles: `customer`, `technician`, `admin`.
+- Collections: `users` (extended via BetterAuth `additionalFields`), `services`, `bookings`, `payments`; BetterAuth owns its own session/account collections.
+- Booking pipeline: `requested` → `accepted` → `in-progress` → `completed`; technician may `reject` and customer may `cancel` only while `requested`. Completion requires `finalAmount > 0`. `completed` + `unpaid` → Stripe Checkout → `paid`.
+- Service listings require admin approval (`pending` / `approved` / `rejected`).
+- Env: server secrets are unprefixed; browser-exposed values need `NEXT_PUBLIC_`. `.env*` is gitignored.
