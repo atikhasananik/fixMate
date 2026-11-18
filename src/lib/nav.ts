@@ -1,22 +1,10 @@
-import type { NavbarUser, UserRole } from "@/types/type";
+import type { UserRole } from "@/types/type";
 
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
   { label: "How It Works", href: "/about" },
 ] as const;
-
-/**
- * Temporary demo session until BetterAuth is wired up.
- * Set this to `null` to preview the signed-out navbar, or replace the
- * navbar state with the real session hook later.
- */
-export const DEMO_USER: NavbarUser = {
-  name: "Ayesha Rahman",
-  email: "ayesha.rahman@example.com",
-  image: "/avatar-demo.svg",
-  role: "customer",
-};
 
 export const ROLE_LABELS: Record<UserRole, string> = {
   customer: "Customer",
@@ -54,6 +42,11 @@ export function getInitials(name: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("");
+}
+
+/** Normalizes a raw session role into the roles the UI knows about. */
+export function normalizeUserRole(role: unknown): UserRole {
+  return role === "technician" || role === "admin" ? role : "customer";
 }
 
 /** Dashboard for a session role, falling back to the customer dashboard. */

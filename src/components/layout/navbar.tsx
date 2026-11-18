@@ -1,27 +1,49 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { LogIn, UserPlus } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/components/ui/toast";
 import { Brand } from "@/components/layout/brand";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
-import {
-  NAV_ITEMS,
-  isActivePath,
-} from "@/lib/nav";
+import { signOut, useSession } from "@/lib/auth-client";
+import { NAV_ITEMS, isActivePath, normalizeUserRole } from "@/lib/nav";
 import type { NavbarUser } from "@/types/type";
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
 
-  // Temporary demo session. Replace this state with the BetterAuth session
-  // hook once authentication is wired up.
-  const [user, setUser] = useState<NavbarUser | null>(null);
+  const user: NavbarUser | null = session
+    ? {
+        name: session.user.name,
+        email: session.user.email,
+        image: session.user.image,
+        role: normalizeUserRole(session.user.role),
+      }
+    : null;
+
+  async function handleSignOut() {
+    const { error } = await signOut();
+
+    if (error) {
+      toast.add({
+        type: "error",
+        title: "Couldn't sign out",
+        description: error.message ?? "Please try again.",
+      });
+      return;
+    }
+
+    router.push("/");
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
@@ -58,9 +80,13 @@ export function Navbar() {
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
 
-          {user ? (
+          {isPending ? (
+            <div className="hidden md:block" aria-hidden="true">
+              <Skeleton className="size-8 rounded-full" />
+            </div>
+          ) : user ? (
             <div className="hidden md:block">
-              <UserMenu user={user} onSignOut={() => setUser(null)} />
+              <UserMenu user={user} onSignOut={handleSignOut} />
             </div>
           ) : (
             <div className="hidden items-center gap-1.5 md:flex">
@@ -83,7 +109,7 @@ export function Navbar() {
             </div>
           )}
 
-          <MobileNav user={user} onSignOut={() => setUser(null)} />
+          <MobileNav user={user} onSignOut={handleSignOut} />
         </div>
       </div>
     </header>
