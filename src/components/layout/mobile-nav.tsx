@@ -138,7 +138,7 @@ export function MobileNav({ user, onSignOut }: MobileNavProps) {
                   />
                 </Link>
                 <Link
-                  href="/profile"
+                  href="/dashboard/profile"
                   onClick={close}
                   className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >

@@ -1,23 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { LogIn, UserPlus } from "lucide-react";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/toast";
 import { Brand } from "@/components/layout/brand";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
-import { signOut, useSession } from "@/lib/auth-client";
+import { useSignOut } from "@/hooks/use-sign-out";
+import { useSession } from "@/lib/auth-client";
 import { NAV_ITEMS, isActivePath, normalizeUserRole } from "@/lib/nav";
 import type { NavbarUser } from "@/types/type";
 
 export function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
+  const handleSignOut = useSignOut();
   const { data: session, isPending } = useSession();
 
   const user: NavbarUser | null = session
@@ -28,22 +28,6 @@ export function Navbar() {
         role: normalizeUserRole(session.user.role),
       }
     : null;
-
-  async function handleSignOut() {
-    const { error } = await signOut();
-
-    if (error) {
-      toast.add({
-        type: "error",
-        title: "Couldn't sign out",
-        description: error.message ?? "Please try again.",
-      });
-      return;
-    }
-
-    router.push("/");
-    router.refresh();
-  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">

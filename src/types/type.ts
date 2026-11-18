@@ -204,3 +204,195 @@ export type FaqSectionProps = {
   items: FaqItem[];
   className?: string;
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                 Dashboard                                  */
+/* -------------------------------------------------------------------------- */
+
+export type BookingStatus =
+  | "requested"
+  | "accepted"
+  | "in-progress"
+  | "completed"
+  | "rejected"
+  | "cancelled";
+
+export type PaymentStatus = "unpaid" | "paid";
+
+export type ServiceApprovalStatus = "pending" | "approved" | "rejected";
+
+export type ServiceMode = "home-visit" | "shop-drop-off";
+
+export type Booking = {
+  id: string;
+  serviceTitle: string;
+  customerId: string;
+  customerName: string;
+  technicianId: string;
+  technicianName: string;
+  /** ISO date string. */
+  preferredDate: string;
+  basePrice: number;
+  finalAmount?: number;
+  status: BookingStatus;
+  paymentStatus: PaymentStatus;
+};
+
+export type ServiceListing = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  basePrice: number;
+  estimatedDuration: string;
+  serviceMode: ServiceMode;
+  serviceArea: string;
+  /** Data URL in the UI prototype; becomes an ImgBB URL once uploads are wired. */
+  image?: string;
+  technicianId: string;
+  technicianName: string;
+  isAvailable: boolean;
+  approvalStatus: ServiceApprovalStatus;
+};
+
+export type PlatformUser = {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+  role: UserRole;
+  /** ISO date string. */
+  joinedAt: string;
+};
+
+export type DashboardViewer = {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  role: UserRole;
+  /** ISO date string. */
+  joinedAt: string;
+};
+
+export type DashboardStat = {
+  label: string;
+  value: number;
+  icon: LucideIcon;
+  hint?: string;
+};
+
+export type DashboardNavItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  /** Match only the exact path (used by overview links). */
+  exact?: boolean;
+};
+
+export type DashboardNavConfig = Record<UserRole, DashboardNavItem[]>;
+
+export type ServiceFormValues = {
+  title: string;
+  category: string;
+  description: string;
+  basePrice: string;
+  estimatedDuration: string;
+  serviceMode: ServiceMode;
+  serviceArea: string;
+  image: string;
+};
+
+export type ServiceFormErrors = Partial<Record<keyof ServiceFormValues, string>>;
+
+export type ServiceFormProps = {
+  mode: "create" | "edit";
+  initialValues?: Partial<ServiceFormValues>;
+  technician: {
+    name: string;
+    email: string;
+  };
+  onSubmit: (values: ServiceFormValues) => void;
+};
+
+export type DashboardStoreProviderProps = {
+  viewer: DashboardViewer;
+  children: ReactNode;
+};
+
+export type DashboardStoreValue = {
+  viewer: DashboardViewer;
+  bookings: Booking[];
+  services: ServiceListing[];
+  users: PlatformUser[];
+  cancelBooking: (bookingId: string) => void;
+  addService: (
+    values: ServiceFormValues,
+    technician: { id: string; name: string }
+  ) => void;
+  updateService: (serviceId: string, values: ServiceFormValues) => void;
+  deleteService: (serviceId: string) => void;
+  setServiceAvailability: (serviceId: string, isAvailable: boolean) => void;
+  setServiceApprovalStatus: (
+    serviceId: string,
+    status: ServiceApprovalStatus
+  ) => void;
+  setUserRole: (userId: string, role: UserRole) => void;
+};
+
+/* Dashboard component props */
+
+export type PageHeaderProps = {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+};
+
+export type StatCardProps = {
+  stat: DashboardStat;
+};
+
+export type StatsGridProps = {
+  stats: DashboardStat[];
+  className?: string;
+};
+
+export type StatusBadgeProps =
+  | { kind: "booking"; status: BookingStatus }
+  | { kind: "payment"; status: PaymentStatus }
+  | { kind: "approval"; status: ServiceApprovalStatus };
+
+export type ServiceThumbnailProps = {
+  title: string;
+  image?: string;
+  className?: string;
+};
+
+export type ServiceCellProps = {
+  title: string;
+  category: string;
+  image?: string;
+};
+
+export type TableCardProps = {
+  title: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+};
+
+export type EmptyStateProps = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  children?: ReactNode;
+};
+
+export type DashboardSidebarProps = {
+  viewer: DashboardViewer;
+};
+
+export type DashboardTopbarProps = {
+  viewer: DashboardViewer;
+};

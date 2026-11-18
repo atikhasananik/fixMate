@@ -83,7 +83,7 @@ export function UserMenu({ user, onSignOut }: UserMenuProps) {
           <LayoutDashboard aria-hidden="true" />
           <span>Dashboard</span>
         </DropdownMenuItem>
-        <DropdownMenuItem render={<Link href="/profile" />}>
+        <DropdownMenuItem render={<Link href="/dashboard/profile" />}>
           <UserRound aria-hidden="true" />
           <span>Update Profile</span>
         </DropdownMenuItem>

@@ -1,4 +1,11 @@
-import type { SignInErrors, SignInValues, SignUpErrors, SignUpValues } from "@/types/type";
+import type {
+  ServiceFormErrors,
+  ServiceFormValues,
+  SignInErrors,
+  SignInValues,
+  SignUpErrors,
+  SignUpValues,
+} from "@/types/type";
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -36,6 +43,54 @@ export function validateSignIn(values: SignInValues): SignInErrors {
 
   if (!values.password) {
     errors.password = "Password is required.";
+  }
+
+  return errors;
+}
+
+export const SERVICE_IMAGE_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+] as const;
+
+export const MAX_SERVICE_IMAGE_BYTES = 5 * 1024 * 1024;
+
+/** Validates the technician service form before it reaches the store/API. */
+export function validateServiceForm(
+  values: ServiceFormValues,
+  options: { requireImage?: boolean } = {}
+): ServiceFormErrors {
+  const errors: ServiceFormErrors = {};
+
+  if (values.title.trim().length < 3) {
+    errors.title = "Give the service a title of at least 3 characters.";
+  }
+
+  if (!values.category) {
+    errors.category = "Choose a category.";
+  }
+
+  if (values.description.trim().length < 20) {
+    errors.description = "Describe the work in at least 20 characters.";
+  }
+
+  const basePrice = Number(values.basePrice);
+
+  if (!values.basePrice.trim() || Number.isNaN(basePrice) || basePrice <= 0) {
+    errors.basePrice = "Enter a base price greater than 0.";
+  }
+
+  if (!values.estimatedDuration.trim()) {
+    errors.estimatedDuration = "Add an estimated duration.";
+  }
+
+  if (!values.serviceArea.trim()) {
+    errors.serviceArea = "Add the area you cover.";
+  }
+
+  if (options.requireImage && !values.image) {
+    errors.image = "Upload a service image.";
   }
 
   return errors;

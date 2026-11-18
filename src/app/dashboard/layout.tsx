@@ -1,12 +1,30 @@
-export default function DashboardLayout({
+import { cookies } from "next/headers";
+import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
+import { DashboardStoreProvider } from "@/components/dashboard/dashboard-store";
+import { DashboardTopbar } from "@/components/dashboard/dashboard-topbar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { getDashboardSession, toDashboardViewer } from "@/lib/dashboard-session";
+
+export default async function DashboardLayout({
   children,
 }: LayoutProps<"/dashboard">) {
+  const session = await getDashboardSession();
+  const viewer = toDashboardViewer(session);
+
+  const cookieStore = await cookies();
+  const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
+
   return (
-    <>
-      {/* <Navbar /> */}
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 py-10 sm:px-6 lg:px-8">
-        {children}
-      </main>
-    </>
+    <DashboardStoreProvider viewer={viewer}>
+      <SidebarProvider defaultOpen={defaultOpen}>
+        <DashboardSidebar viewer={viewer} />
+        <SidebarInset>
+          <DashboardTopbar viewer={viewer} />
+          <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            {children}
+          </div>
+        </SidebarInset>
+      </SidebarProvider>
+    </DashboardStoreProvider>
   );
 }
