@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { Wrench } from "lucide-react";
 import { cn } from "cn";
-
-type BrandProps = {
-  className?: string;
-  onClick?: () => void;
-};
+import type { BrandProps } from "@/types/type";
 
 export function Brand({ className, onClick }: BrandProps) {
   return (

@@ -1,19 +1,8 @@
-import type { LucideIcon } from "lucide-react";
 import { Workflow } from "lucide-react";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
-
-import StepCard, { HowItWorksStep } from "./stepCard";
-
-
-
-type HowItWorksProps = {
-  eyebrow?: string;
-  title: string;
-  description?: string;
-  steps: HowItWorksStep[];
-  className?: string;
-};
+import StepCard from "./stepCard";
+import type { HowItWorksProps } from "@/types/type";
 
 export function HowItWorks({
   eyebrow,

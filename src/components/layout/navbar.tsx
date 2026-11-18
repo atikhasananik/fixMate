@@ -14,8 +14,8 @@ import {
   DEMO_USER,
   NAV_ITEMS,
   isActivePath,
-  type NavbarUser,
 } from "@/lib/nav";
+import type { NavbarUser } from "@/types/type";
 
 export function Navbar() {
   const pathname = usePathname();

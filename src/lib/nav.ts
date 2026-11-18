@@ -1,11 +1,4 @@
-export type UserRole = "customer" | "technician" | "admin";
-
-export type NavbarUser = {
-  name: string;
-  email: string;
-  image?: string | null;
-  role: UserRole;
-};
+import type { NavbarUser, UserRole } from "@/types/type";
 
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },

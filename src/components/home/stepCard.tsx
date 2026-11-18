@@ -1,12 +1,5 @@
-import { LucideIcon } from "lucide-react";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
-
-
-export type HowItWorksStep = {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-};
+import type { HowItWorksStep } from "@/types/type";
 
 function StepCard({ step, index }: { step: HowItWorksStep; index: number }) {
   const Icon = step.icon;

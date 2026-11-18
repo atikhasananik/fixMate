@@ -22,13 +22,8 @@ import {
   ROLE_BADGE_CLASSES,
   ROLE_LABELS,
   getInitials,
-  type NavbarUser,
 } from "@/lib/nav";
-
-type UserMenuProps = {
-  user: NavbarUser;
-  onSignOut: () => void;
-};
+import type { UserMenuProps } from "@/types/type";
 
 export function UserMenu({ user, onSignOut }: UserMenuProps) {
   const initials = getInitials(user.name);

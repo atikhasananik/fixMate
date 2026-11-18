@@ -1,11 +1,7 @@
 import Image from "next/image";
 import { BadgeCheck, Wallet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-
-type HeroVisualProps = {
-  src: string;
-  alt: string;
-};
+import type { HeroVisualProps } from "@/types/type";
 
 // DaisyUI's `hover-3d` uses eight transparent siblings as a 3x3 hover map
 // around the first child (the center cell is intentionally left empty).

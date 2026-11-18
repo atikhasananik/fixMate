@@ -1,29 +1,10 @@
-import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HeroVisual } from "@/components/home/hero-visual";
-
-type HeroAction = {
-  label: string;
-  href: string;
-};
-
-type HeroSectionProps = {
-  eyebrow?: string;
-  title: ReactNode;
-  description: string;
-  primaryAction: HeroAction;
-  secondaryAction?: HeroAction;
-  image: {
-    src: string;
-    alt: string;
-  };
-  highlights?: string[];
-  className?: string;
-};
+import type { HeroSectionProps } from "@/types/type";
 
 export function HeroSection({
   eyebrow,

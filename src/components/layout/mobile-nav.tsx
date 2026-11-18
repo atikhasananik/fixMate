@@ -31,13 +31,8 @@ import {
   ROLE_LABELS,
   getInitials,
   isActivePath,
-  type NavbarUser,
 } from "@/lib/nav";
-
-type MobileNavProps = {
-  user: NavbarUser | null;
-  onSignOut: () => void;
-};
+import type { MobileNavProps } from "@/types/type";
 
 export function MobileNav({ user, onSignOut }: MobileNavProps) {
   const pathname = usePathname();

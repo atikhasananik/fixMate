@@ -1,10 +1,4 @@
-import type { ReactNode } from "react";
-
-type PagePlaceholderProps = {
-  title: string;
-  description: string;
-  children?: ReactNode;
-};
+import type { PagePlaceholderProps } from "@/types/type";
 
 export function PagePlaceholder({
   title,
