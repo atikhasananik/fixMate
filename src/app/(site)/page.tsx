@@ -18,7 +18,14 @@ import { HeroSection } from "@/components/home/hero-section";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { PopularCategories } from "@/components/home/popular-categories";
 import { WhyChooseUs } from "@/components/home/why-choose-us";
-import type { ServiceCategory, TrustPoint } from "@/types/type";
+import { CustomerReviews } from "@/components/home/customer-reviews";
+import { FaqSection } from "@/components/home/faq-section";
+import type {
+  CustomerReview,
+  FaqItem,
+  ServiceCategory,
+  TrustPoint,
+} from "@/types/type";
 
 const categories: ServiceCategory[] = [
   {
@@ -87,6 +94,68 @@ const trustPoints: TrustPoint[] = [
     icon: Clock,
     title: "Real-time tracking",
     description: "Follow your job from request to completion.",
+  },
+];
+
+// Sample testimonials for the landing page. Replace with real completed
+// bookings once reviews are stored in the database.
+const customerReviews: CustomerReview[] = [
+  {
+    name: "Nusrat Jahan",
+    service: "Phone screen repair",
+    quote:
+      "My screen cracked on a Friday and was replaced the same afternoon. The technician confirmed the price before starting, and it was exactly what I paid.",
+    rating: 5,
+    verified: true,
+  },
+  {
+    name: "Tanvir Ahmed",
+    service: "AC servicing",
+    quote:
+      "Booked a service before summer and the technician arrived on time, worked cleanly, and explained what needed attention. The cooling has been perfect since.",
+    rating: 5,
+    verified: true,
+  },
+  {
+    name: "Farhana Islam",
+    service: "Laptop keyboard repair",
+    quote:
+      "My keyboard stopped working mid-project. I found a technician nearby and could follow the whole repair from my dashboard without chasing anyone.",
+    rating: 4,
+    verified: true,
+  },
+];
+
+const faqs: FaqItem[] = [
+  {
+    question: "How does FixMate work?",
+    answer:
+      "Start by browsing the approved services for your device and sending a request with the issue and your preferred time. Verified technicians nearby can then accept the job. From there you follow the repair from your dashboard, and you only pay once the work is completed.",
+  },
+  {
+    question: "Which devices can be repaired?",
+    answer:
+      "FixMate currently covers smartphones, laptops and PCs, air conditioners, refrigerators, TVs, washing machines, and electrical work. Each category lists the specific services available — from screen and battery replacements to gas refills, compressor repairs, and wiring checks — with an upfront estimate so you know the expected cost before booking.",
+  },
+  {
+    question: "Who are the technicians?",
+    answer:
+      "Every technician is background-checked before they can accept jobs, and only approved service listings appear on FixMate. That means the person assigned to your repair has been verified by the platform, rather than found through an open marketplace with no checks in place.",
+  },
+  {
+    question: "Can I cancel a repair request?",
+    answer:
+      "Yes, while your request is still waiting for a technician to accept it, you can cancel it from your dashboard at no cost. Once a technician accepts the job they have reserved that time for you and the booking is already underway, so the request can no longer be cancelled.",
+  },
+  {
+    question: "When and how do I pay?",
+    answer:
+      "Nothing is charged when you send a request. After the technician finishes the repair, the final amount is added to the booking and you receive a secure checkout link. Payment is completed online, and the booking is marked as paid as soon as the checkout goes through — so you settle the bill for work that has already been done.",
+  },
+  {
+    question: "How do I track my repair?",
+    answer:
+      "Every booking has a status you can check at any time: requested while it waits for a technician, accepted once someone takes the job, in progress while the repair is happening, and completed when the work is finished. The status updates on your dashboard as the technician moves the job forward, so you never have to call to find out where things stand.",
   },
 ];
 
@@ -162,6 +231,20 @@ export default function Home() {
         title="Repairs you can actually trust"
         description="Verified people, clear pricing, and payment only when the job is done."
         points={trustPoints}
+      />
+
+      <CustomerReviews
+        eyebrow="Customer reviews"
+        title="Happy customers, fixed devices"
+        description="Real repairs, clear communication, and payments only after the work is done."
+        reviews={customerReviews}
+      />
+
+      <FaqSection
+        eyebrow="FAQ"
+        title="Frequently asked questions"
+        description="Everything you need to know before booking your first repair."
+        items={faqs}
       />
     </div>
   );

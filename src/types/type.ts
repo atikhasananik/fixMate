@@ -161,3 +161,46 @@ export type WhyChooseUsProps = {
   points: TrustPoint[];
   className?: string;
 };
+
+/* -------------------------------------------------------------------------- */
+/*                                   Reviews                                  */
+/* -------------------------------------------------------------------------- */
+
+export type CustomerReview = {
+  name: string;
+  /** Repair that was booked, e.g. "AC Repair". */
+  service: string;
+  quote: string;
+  /** 1–5 stars. */
+  rating: number;
+  verified?: boolean;
+};
+
+export type ReviewCardProps = {
+  review: CustomerReview;
+};
+
+export type CustomerReviewsProps = {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  reviews: CustomerReview[];
+  className?: string;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                    FAQ                                     */
+/* -------------------------------------------------------------------------- */
+
+export type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+export type FaqSectionProps = {
+  eyebrow?: string;
+  title: string;
+  description?: string;
+  items: FaqItem[];
+  className?: string;
+};
