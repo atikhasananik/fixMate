@@ -1,4 +1,6 @@
+import { Search, Send, Wallet, Wrench } from "lucide-react";
 import { HeroSection } from "@/components/home/hero-section";
+import { HowItWorks } from "@/components/home/how-it-works";
 
 export default function Home() {
   return (
@@ -25,6 +27,38 @@ export default function Home() {
           "Verified technicians",
           "Upfront estimates",
           "Pay after service",
+        ]}
+      />
+
+      <HowItWorks
+        eyebrow="How it works"
+        title="From request to repair in four simple steps"
+        description="Tell us what needs fixing, pick a verified technician, and pay only after the job is done — no hidden fees, no guesswork."
+        steps={[
+          {
+            icon: Search,
+            title: "Find a Service",
+            description:
+              "Browse approved repair services for phones, laptops, and home appliances, with clear upfront estimates.",
+          },
+          {
+            icon: Send,
+            title: "Send a Request",
+            description:
+              "Share your device details and preferred time so verified technicians nearby can accept the job.",
+          },
+          {
+            icon: Wrench,
+            title: "Technician Fixes It",
+            description:
+              "Track the repair as your technician diagnoses the issue and completes the work.",
+          },
+          {
+            icon: Wallet,
+            title: "Pay After Completion",
+            description:
+              "Pay securely only once you're happy with the finished repair.",
+          },
         ]}
       />
     </div>
