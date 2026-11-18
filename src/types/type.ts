@@ -33,6 +33,31 @@ export type RoleOption = {
   icon: LucideIcon;
 };
 
+export type SignInValues = {
+  email: string;
+  password: string;
+};
+
+export type SignInErrors = Partial<Record<keyof SignInValues, string>>;
+
+export type SignInFormProps = {
+  /** Internal path to return to after login (e.g. the page the user tried to open). */
+  redirectTo?: string;
+  googleEnabled: boolean;
+};
+
+export type GoogleSignInButtonProps = {
+  callbackURL: string;
+};
+
+export type AuthPageShellProps = {
+  title: string;
+  description: string;
+  children: ReactNode;
+  footer: ReactNode;
+  highlights?: string[];
+};
+
 /* -------------------------------------------------------------------------- */
 /*                                   Layout                                   */
 /* -------------------------------------------------------------------------- */

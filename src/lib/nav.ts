@@ -55,3 +55,38 @@ export function getInitials(name: string) {
     .map((part) => part[0]?.toUpperCase())
     .join("");
 }
+
+/** Dashboard for a session role, falling back to the customer dashboard. */
+export function getRoleDashboardPath(role: string | null | undefined) {
+  if (role === "technician") {
+    return DASHBOARD_PATHS.technician;
+  }
+
+  if (role === "admin") {
+    return DASHBOARD_PATHS.admin;
+  }
+
+  return DASHBOARD_PATHS.customer;
+}
+
+/**
+ * Accepts only internal paths, so `?redirect=` cannot be used for an open
+ * redirect, and never sends users back to the auth pages.
+ */
+export function sanitizeRedirectPath(
+  value: string | string[] | undefined
+): string | undefined {
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return undefined;
+  }
+
+  if (value === "/sign-in" || value.startsWith("/sign-in?") || value.startsWith("/sign-in/")) {
+    return undefined;
+  }
+
+  return value;
+}

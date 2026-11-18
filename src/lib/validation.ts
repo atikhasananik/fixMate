@@ -1,4 +1,4 @@
-import type { SignUpErrors, SignUpValues } from "@/types/type";
+import type { SignInErrors, SignInValues, SignUpErrors, SignUpValues } from "@/types/type";
 
 export const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -22,6 +22,23 @@ export function getPasswordError(password: string): string | null {
   }
 
   return null;
+}
+
+/** Validates the sign-in form. Password complexity is enforced at sign-up. */
+export function validateSignIn(values: SignInValues): SignInErrors {
+  const errors: SignInErrors = {};
+
+  if (!values.email.trim()) {
+    errors.email = "Email is required.";
+  } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+    errors.email = "Enter a valid email address.";
+  }
+
+  if (!values.password) {
+    errors.password = "Password is required.";
+  }
+
+  return errors;
 }
 
 /** Validates the sign-up form and returns a message per invalid field. */

@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/page-placeholder";
+import { SignInForm } from "@/components/auth/sign-in-form";
+import { isGoogleAuthEnabled } from "@/lib/auth-providers";
+import { sanitizeRedirectPath } from "@/lib/nav";
 
 export const metadata: Metadata = {
   title: "Sign In",
 };
 
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: PageProps<"/sign-in">) {
+  const params = await searchParams;
+
   return (
-    <PagePlaceholder
-      title="Sign In"
-      description="Authentication is being connected. This page will host the FixMate sign-in form."
+    <SignInForm
+      redirectTo={sanitizeRedirectPath(params.redirect)}
+      googleEnabled={isGoogleAuthEnabled()}
     />
   );
 }

@@ -3,10 +3,9 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Eye, EyeOff, Loader2, UserRound, Wrench } from "lucide-react";
-import { Brand } from "@/components/layout/brand";
+import { Eye, EyeOff, Loader2, UserRound, Wrench } from "lucide-react";
+import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Field,
   FieldContent,
@@ -52,12 +51,6 @@ const INITIAL_VALUES: SignUpValues = {
   password: "",
   role: "customer",
 };
-
-const TRUST_HIGHLIGHTS = [
-  "Verified technicians",
-  "Upfront estimates",
-  "Pay after service",
-];
 
 export function SignUpForm() {
   const router = useRouter();
@@ -131,159 +124,11 @@ export function SignUpForm() {
   }
 
   return (
-    <div className="w-full max-w-md">
-      <div className="flex flex-col items-center text-center">
-        <Brand />
-
-        <h1 className="mt-6 text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-          Create your FixMate account
-        </h1>
-        <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Sign up to book trusted technicians for your devices or start taking
-          repair jobs of your own.
-        </p>
-      </div>
-
-      <Card className="mt-8 w-full rounded-2xl border border-border/70 shadow-lg shadow-slate-900/5 [--card-spacing:1.5rem]">
-        <CardContent>
-          <form noValidate onSubmit={handleSubmit}>
-            <FieldGroup>
-              <Field data-invalid={Boolean(errors.name)}>
-                <FieldLabel htmlFor="name">Full name</FieldLabel>
-                <Input
-                  id="name"
-                  name="name"
-                  autoComplete="name"
-                  placeholder="Ayesha Rahman"
-                  value={values.name}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.name)}
-                  aria-describedby={errors.name ? "name-error" : undefined}
-                  className="h-10 px-3"
-                />
-                <FieldError id="name-error">{errors.name}</FieldError>
-              </Field>
-
-              <Field data-invalid={Boolean(errors.email)}>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  value={values.email}
-                  onChange={handleChange}
-                  aria-invalid={Boolean(errors.email)}
-                  aria-describedby={errors.email ? "email-error" : undefined}
-                  className="h-10 px-3"
-                />
-                <FieldError id="email-error">{errors.email}</FieldError>
-              </Field>
-
-              <Field data-invalid={Boolean(errors.password)}>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    value={values.password}
-                    onChange={handleChange}
-                    aria-invalid={Boolean(errors.password)}
-                    aria-describedby={
-                      errors.password
-                        ? "password-error"
-                        : "password-description"
-                    }
-                    className="h-10 pr-10 pl-3"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => setShowPassword((visible) => !visible)}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                    aria-pressed={showPassword}
-                    aria-controls="password"
-                    className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="size-4" aria-hidden="true" />
-                    ) : (
-                      <Eye className="size-4" aria-hidden="true" />
-                    )}
-                  </Button>
-                </div>
-                <FieldDescription id="password-description">
-                  At least {PASSWORD_MIN_LENGTH} characters, including one
-                  uppercase and one lowercase letter.
-                </FieldDescription>
-                <FieldError id="password-error">{errors.password}</FieldError>
-              </Field>
-
-              <FieldSet>
-                <FieldLegend variant="label">I want to join as</FieldLegend>
-                <RadioGroup
-                  value={values.role}
-                  onValueChange={(value) =>
-                    setField("role", value as SignUpRole)
-                  }
-                >
-                  {ROLE_OPTIONS.map((option) => {
-                    const Icon = option.icon;
-
-                    return (
-                      <FieldLabel
-                        key={option.value}
-                        htmlFor={`role-${option.value}`}
-                        className="cursor-pointer"
-                      >
-                        <Field orientation="horizontal">
-                          <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
-                            <Icon className="size-4" aria-hidden="true" />
-                          </span>
-
-                          <FieldContent>
-                            <FieldTitle>{option.title}</FieldTitle>
-                            <FieldDescription>
-                              {option.description}
-                            </FieldDescription>
-                          </FieldContent>
-
-                          <RadioGroupItem
-                            id={`role-${option.value}`}
-                            value={option.value}
-                          />
-                        </Field>
-                      </FieldLabel>
-                    );
-                  })}
-                </RadioGroup>
-              </FieldSet>
-
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="h-11 w-full rounded-xl bg-blue-600 text-sm font-medium text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" aria-hidden="true" />
-                    Creating account…
-                  </>
-                ) : (
-                  "Create account"
-                )}
-              </Button>
-            </FieldGroup>
-          </form>
-        </CardContent>
-
-        <CardFooter className="justify-center gap-1 text-sm text-muted-foreground">
+    <AuthPageShell
+      title="Create your FixMate account"
+      description="Sign up to book trusted technicians for your devices or start taking repair jobs of your own."
+      footer={
+        <>
           Already have an account?
           <Link
             href="/sign-in"
@@ -291,20 +136,138 @@ export function SignUpForm() {
           >
             Sign in
           </Link>
-        </CardFooter>
-      </Card>
-
-      <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-        {TRUST_HIGHLIGHTS.map((highlight) => (
-          <li key={highlight} className="flex items-center gap-1.5">
-            <CheckCircle2
-              className="size-3.5 text-blue-600 dark:text-blue-400"
-              aria-hidden="true"
+        </>
+      }
+    >
+      <form noValidate onSubmit={handleSubmit}>
+        <FieldGroup>
+          <Field data-invalid={Boolean(errors.name)}>
+            <FieldLabel htmlFor="name">Full name</FieldLabel>
+            <Input
+              id="name"
+              name="name"
+              autoComplete="name"
+              placeholder="Ayesha Rahman"
+              value={values.name}
+              onChange={handleChange}
+              aria-invalid={Boolean(errors.name)}
+              aria-describedby={errors.name ? "name-error" : undefined}
+              className="h-10 px-3"
             />
-            {highlight}
-          </li>
-        ))}
-      </ul>
-    </div>
+            <FieldError id="name-error">{errors.name}</FieldError>
+          </Field>
+
+          <Field data-invalid={Boolean(errors.email)}>
+            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={values.email}
+              onChange={handleChange}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              className="h-10 px-3"
+            />
+            <FieldError id="email-error">{errors.email}</FieldError>
+          </Field>
+
+          <Field data-invalid={Boolean(errors.password)}>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <div className="relative">
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="new-password"
+                value={values.password}
+                onChange={handleChange}
+                aria-invalid={Boolean(errors.password)}
+                aria-describedby={
+                  errors.password ? "password-error" : "password-description"
+                }
+                className="h-10 pr-10 pl-3"
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                aria-controls="password"
+                className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="size-4" aria-hidden="true" />
+                )}
+              </Button>
+            </div>
+            <FieldDescription id="password-description">
+              At least {PASSWORD_MIN_LENGTH} characters, including one uppercase
+              and one lowercase letter.
+            </FieldDescription>
+            <FieldError id="password-error">{errors.password}</FieldError>
+          </Field>
+
+          <FieldSet>
+            <FieldLegend variant="label">I want to join as</FieldLegend>
+            <RadioGroup
+              value={values.role}
+              onValueChange={(value) => setField("role", value as SignUpRole)}
+            >
+              {ROLE_OPTIONS.map((option) => {
+                const Icon = option.icon;
+
+                return (
+                  <FieldLabel
+                    key={option.value}
+                    htmlFor={`role-${option.value}`}
+                    className="cursor-pointer"
+                  >
+                    <Field orientation="horizontal">
+                      <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
+                        <Icon className="size-4" aria-hidden="true" />
+                      </span>
+
+                      <FieldContent>
+                        <FieldTitle>{option.title}</FieldTitle>
+                        <FieldDescription>
+                          {option.description}
+                        </FieldDescription>
+                      </FieldContent>
+
+                      <RadioGroupItem
+                        id={`role-${option.value}`}
+                        value={option.value}
+                      />
+                    </Field>
+                  </FieldLabel>
+                );
+              })}
+            </RadioGroup>
+          </FieldSet>
+
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-11 w-full rounded-xl bg-blue-600 text-sm font-medium text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" aria-hidden="true" />
+                Creating account…
+              </>
+            ) : (
+              "Create account"
+            )}
+          </Button>
+        </FieldGroup>
+      </form>
+    </AuthPageShell>
   );
 }
