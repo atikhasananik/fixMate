@@ -31,7 +31,21 @@ export const auth = betterAuth({
         type: "string",
         required: false,
         defaultValue: "customer",
-        // Allows `signUp.email({ role })` from the client.
+        input: true,
+      },
+      phone: {
+        type: "number",
+        required: false,
+        input: true,
+      },
+      bio: {
+        type: "string",
+        required: false,
+        input: true,
+      },
+      area: {
+        type: "string",
+        required: false,
         input: true,
       },
     },
