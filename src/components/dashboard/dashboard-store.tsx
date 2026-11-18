@@ -6,10 +6,12 @@ import {
   SAMPLE_SERVICES,
   SAMPLE_USERS,
 } from "@/lib/dashboard-data";
+import { SERVICE_MODE_VALUE_BY_LABEL } from "@/lib/service-payload";
 import type {
   Booking,
   DashboardStoreProviderProps,
   DashboardStoreValue,
+  IServiceData,
   PlatformUser,
   ServiceListing,
 } from "@/types/type";
@@ -58,24 +60,22 @@ export function DashboardStoreProvider({
     );
   }
 
-  function addService(
-    values: Parameters<DashboardStoreValue["addService"]>[0],
-    technician: Parameters<DashboardStoreValue["addService"]>[1]
-  ) {
+  function addService(data: IServiceData) {
     const service: ServiceListing = {
       id: `svc-${crypto.randomUUID()}`,
-      title: values.title.trim(),
-      category: values.category,
-      description: values.description.trim(),
-      basePrice: Number(values.basePrice),
-      estimatedDuration: values.estimatedDuration.trim(),
-      serviceMode: values.serviceMode,
-      serviceArea: values.serviceArea.trim(),
-      image: values.image || undefined,
-      technicianId: technician.id,
-      technicianName: technician.name,
-      isAvailable: true,
-      approvalStatus: "pending",
+      title: data.title.trim(),
+      category: data.category,
+      description: data.description.trim(),
+      basePrice: data.basePrice,
+      estimatedDuration: data.estimatedDuration.trim(),
+      serviceMode: SERVICE_MODE_VALUE_BY_LABEL[data.serviceMode],
+      serviceArea: data.serviceArea.trim(),
+      image: data.image || undefined,
+      technicianId: viewer.id,
+      technicianName: data.technicianName,
+      isAvailable: data.isAvailable,
+      approvalStatus: data.approvalStatus,
+      createdAt: data.createdAt,
     };
 
     setServices((previous) => [service, ...previous]);

@@ -11,13 +11,14 @@ import type {
   Booking,
   BookingStatus,
   DashboardStat,
+  IServiceData,
   PlatformUser,
   ServiceApprovalStatus,
   ServiceListing,
   ServiceMode,
 } from "@/types/type";
 
-export const SERVICE_CATEGORIES = [
+export const SERVICE_CATEGORIES: readonly IServiceData["category"][] = [
   "Smartphone",
   "Laptop & PC",
   "AC",
@@ -25,7 +26,7 @@ export const SERVICE_CATEGORIES = [
   "TV",
   "Washing Machine",
   "Electrical",
-] as const;
+];
 
 export const SERVICE_MODE_LABELS: Record<ServiceMode, string> = {
   "home-visit": "Home visit",
@@ -103,6 +104,7 @@ export const SAMPLE_USERS: PlatformUser[] = [
 export const SAMPLE_SERVICES: ServiceListing[] = [
   {
     id: "svc-1",
+    createdAt: new Date("2026-06-02"),
     title: "iPhone Screen Replacement",
     category: "Smartphone",
     description:
@@ -118,6 +120,7 @@ export const SAMPLE_SERVICES: ServiceListing[] = [
   },
   {
     id: "svc-2",
+    createdAt: new Date("2026-06-18"),
     title: "Laptop Keyboard Repair",
     category: "Laptop & PC",
     description:
@@ -133,6 +136,7 @@ export const SAMPLE_SERVICES: ServiceListing[] = [
   },
   {
     id: "svc-3",
+    createdAt: new Date("2026-07-05"),
     title: "AC Servicing & Gas Refill",
     category: "AC",
     description:
@@ -148,6 +152,7 @@ export const SAMPLE_SERVICES: ServiceListing[] = [
   },
   {
     id: "svc-4",
+    createdAt: new Date("2026-07-23"),
     title: "Refrigerator Compressor Check",
     category: "Refrigerator",
     description:
@@ -163,6 +168,7 @@ export const SAMPLE_SERVICES: ServiceListing[] = [
   },
   {
     id: "svc-5",
+    createdAt: new Date("2026-08-09"),
     title: "Washing Machine Drain Fix",
     category: "Washing Machine",
     description:
@@ -178,6 +184,7 @@ export const SAMPLE_SERVICES: ServiceListing[] = [
   },
   {
     id: "svc-6",
+    createdAt: new Date("2026-08-30"),
     title: "Smart TV Backlight Repair",
     category: "TV",
     description:

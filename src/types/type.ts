@@ -253,6 +253,7 @@ export type ServiceListing = {
   technicianName: string;
   isAvailable: boolean;
   approvalStatus: ServiceApprovalStatus;
+  createdAt: Date;
 };
 
 export type PlatformUser = {
@@ -326,10 +327,7 @@ export type DashboardStoreValue = {
   services: ServiceListing[];
   users: PlatformUser[];
   cancelBooking: (bookingId: string) => void;
-  addService: (
-    values: ServiceFormValues,
-    technician: { id: string; name: string }
-  ) => void;
+  addService: (data: IServiceData) => void;
   updateService: (serviceId: string, values: ServiceFormValues) => void;
   deleteService: (serviceId: string) => void;
   setServiceAvailability: (serviceId: string, isAvailable: boolean) => void;
@@ -396,3 +394,28 @@ export type DashboardSidebarProps = {
 export type DashboardTopbarProps = {
   viewer: DashboardViewer;
 };
+
+
+
+export interface IServiceData {
+  title: string;
+  category:
+    | "Smartphone"
+    | "Laptop & PC"
+    | "AC"
+    | "Refrigerator"
+    | "TV"
+    | "Washing Machine"
+    | "Electrical";
+  description: string;
+  image: string;
+  basePrice: number;
+  estimatedDuration: string;
+  serviceMode: "Home Visit" | "Shop Drop-off";
+  serviceArea: string;
+  technicianName: string;
+  technicianEmail: string;
+  approvalStatus: "pending" | "approved" | "rejected";
+  isAvailable: boolean;
+  createdAt: Date;
+}

@@ -6,6 +6,7 @@ import { ServiceForm } from "@/components/dashboard/service-form";
 import { useDashboardStore } from "@/components/dashboard/dashboard-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/toast";
+import { buildServiceData } from "@/lib/service-payload";
 import type { ServiceFormValues } from "@/types/type";
 
 export function AddService() {
@@ -13,7 +14,19 @@ export function AddService() {
   const { viewer, addService } = useDashboardStore();
 
   function handleSubmit(values: ServiceFormValues) {
-    addService(values, { id: viewer.id, name: viewer.name });
+    // Form state → API body. Technician comes from the session, and the
+    // approval/availability/createdAt defaults are set inside the builder.
+    const data = buildServiceData(values, viewer);
+
+    addService(data);
+    console.log(data);
+
+    // TODO: swap for the real API once the endpoint exists.
+    // const servicePostResult = await fetch("/api/services", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify(data),
+    // });
 
     toast.add({
       type: "success",
@@ -26,13 +39,15 @@ export function AddService() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Add a Service"
-        description="Create a repair listing. New and edited services are reviewed by an admin before going live."
-      />
+    <div className="flex w-full flex-col items-center gap-6">
+      <div className="w-full max-w-3xl">
+        <PageHeader
+          title="Add a Service"
+          description="Create a repair listing. New and edited services are reviewed by an admin before going live."
+        />
+      </div>
 
-      <Card className="max-w-3xl rounded-2xl border border-border/70 ring-0 shadow-sm [--card-spacing:1.5rem]">
+      <Card className="mx-auto w-full max-w-3xl rounded-2xl border border-border/70 ring-0 shadow-sm [--card-spacing:1.5rem]">
         <CardContent>
           <ServiceForm
             mode="create"
