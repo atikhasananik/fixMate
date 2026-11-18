@@ -14,6 +14,25 @@ export type NavbarUser = {
   role: UserRole;
 };
 
+/** Roles a visitor can pick on the sign-up form. `admin` is never self-assignable. */
+export type SignUpRole = "customer" | "technician";
+
+export type SignUpValues = {
+  name: string;
+  email: string;
+  password: string;
+  role: SignUpRole;
+};
+
+export type SignUpErrors = Partial<Record<keyof SignUpValues, string>>;
+
+export type RoleOption = {
+  value: SignUpRole;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+};
+
 /* -------------------------------------------------------------------------- */
 /*                                   Layout                                   */
 /* -------------------------------------------------------------------------- */

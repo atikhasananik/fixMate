@@ -11,7 +11,6 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserMenu } from "@/components/layout/user-menu";
 import {
-  DEMO_USER,
   NAV_ITEMS,
   isActivePath,
 } from "@/lib/nav";
@@ -22,7 +21,7 @@ export function Navbar() {
 
   // Temporary demo session. Replace this state with the BetterAuth session
   // hook once authentication is wired up.
-  const [user, setUser] = useState<NavbarUser | null>(DEMO_USER);
+  const [user, setUser] = useState<NavbarUser | null>(null);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
