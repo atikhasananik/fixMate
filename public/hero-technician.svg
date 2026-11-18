@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-label="Illustration of a smartphone being repaired with a screwdriver and a gear">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B1220" />
+      <stop offset="0.55" stop-color="#111C31" />
+      <stop offset="1" stop-color="#0A0F1A" />
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.42" r="0.5">
+      <stop offset="0" stop-color="#3B82F6" stop-opacity="0.45" />
+      <stop offset="0.6" stop-color="#2563EB" stop-opacity="0.12" />
+      <stop offset="1" stop-color="#2563EB" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="screen" x1="300" y1="270" x2="520" y2="690" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#16213A" />
+      <stop offset="1" stop-color="#0D1526" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#BFDBFE" />
+      <stop offset="0.5" stop-color="#60A5FA" />
+      <stop offset="1" stop-color="#2563EB" />
+    </linearGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#93C5FD" stroke-opacity="0.06" stroke-width="1" />
+    </pattern>
+    <filter id="soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="20" />
+    </filter>
+  </defs>
+
+  <rect width="800" height="1000" fill="url(#bg)" />
+  <rect width="800" height="1000" fill="url(#grid)" />
+  <circle cx="400" cy="430" r="390" fill="url(#glow)" />
+
+  <!-- Orbit rings -->
+  <circle cx="400" cy="470" r="300" fill="none" stroke="#3B82F6" stroke-opacity="0.16" stroke-width="2" />
+  <circle cx="400" cy="470" r="360" fill="none" stroke="#60A5FA" stroke-opacity="0.08" stroke-width="2" />
+
+  <!-- Gear -->
+  <g transform="translate(566 312)">
+    <circle r="96" fill="none" stroke="#1D4ED8" stroke-opacity="0.9" stroke-width="26" stroke-dasharray="26 20" />
+    <circle r="96" fill="none" stroke="#60A5FA" stroke-opacity="0.32" stroke-width="26" stroke-dasharray="13 33" />
+    <circle r="64" fill="#0E1729" stroke="#3B82F6" stroke-opacity="0.7" stroke-width="4" />
+    <circle r="26" fill="#0A1020" stroke="#60A5FA" stroke-opacity="0.6" stroke-width="3" />
+  </g>
+
+  <!-- Screwdriver behind the phone -->
+  <g transform="rotate(40 400 500)">
+    <rect x="376" y="120" width="48" height="176" rx="24" fill="url(#metal)" />
+    <path d="M386 168h28M386 196h28M386 224h28" stroke="#0B1220" stroke-opacity="0.25" stroke-width="4" stroke-linecap="round" />
+    <rect x="392" y="296" width="16" height="300" rx="4" fill="#94A3B8" />
+    <path d="M392 596h16l-4 30h-8z" fill="#CBD5E1" />
+  </g>
+
+  <!-- Phone -->
+  <g transform="rotate(-8 400 470)">
+    <rect x="258" y="228" width="284" height="494" rx="46" fill="#050A14" opacity="0.75" filter="url(#soft)" />
+    <rect x="268" y="238" width="264" height="474" rx="40" fill="#0D1526" stroke="#2B3A52" stroke-width="4" />
+    <rect x="286" y="256" width="228" height="438" rx="28" fill="url(#screen)" />
+    <rect x="366" y="272" width="68" height="10" rx="5" fill="#334155" />
+
+    <!-- Cracked screen -->
+    <path d="M318 354 L372 438 L338 522 L410 598" fill="none" stroke="#7DD3FC" stroke-opacity="0.85" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" />
+    <path d="M372 438 L432 472 M338 522 L288 550 M410 598 L452 640" fill="none" stroke="#7DD3FC" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round" />
+
+    <!-- Repair progress -->
+    <rect x="312" y="546" width="176" height="12" rx="6" fill="#1E293B" />
+    <rect x="312" y="574" width="118" height="12" rx="6" fill="#1E293B" />
+    <circle cx="400" cy="638" r="26" fill="none" stroke="#3B82F6" stroke-opacity="0.55" stroke-width="4" />
+    <path d="M388 638 l8 8 l16 -17" fill="none" stroke="#60A5FA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Sparkles -->
+  <g fill="#93C5FD">
+    <path d="M220 300c4 14 8 18 22 22-14 4-18 8-22 22-4-14-8-18-22-22 14-4 18-8 22-22z" opacity="0.9" />
+    <path d="M612 706c5 17 10 22 27 27-17 5-22 10-27 27-5-17-10-22-27-27 17-5 22-10 27-27z" opacity="0.75" />
+    <path d="M186 640c3 11 6 14 17 17-11 3-14 6-17 17-3-11-6-14-17-17 11-3 14-6 17-17z" opacity="0.6" />
+    <path d="M648 206c3 10 6 13 16 16-10 3-13 6-16 16-3-10-6-13-16-16 10-3 13-6 16-16z" opacity="0.55" />
+  </g>
+
+  <g fill="#3B82F6" opacity="0.5">
+    <circle cx="222" cy="452" r="5" />
+    <circle cx="588" cy="560" r="4" />
+    <circle cx="330" cy="760" r="6" />
+    <circle cx="512" cy="180" r="4" />
+  </g>
+</svg>
