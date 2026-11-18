@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Roboto, Roboto_Mono } from "next/font/google";
-import { Navbar } from "@/components/layout/navbar";
 import "./globals.css";
 
 const roboto = Roboto({
@@ -50,10 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />
       </head>
-      <body className="flex min-h-full flex-col">
-        <Navbar />
-        <main className="flex flex-1 flex-col">{children}</main>
-      </body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
