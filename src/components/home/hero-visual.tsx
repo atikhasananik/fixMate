@@ -7,6 +7,10 @@ type HeroVisualProps = {
   alt: string;
 };
 
+// DaisyUI's `hover-3d` uses eight transparent siblings as a 3x3 hover map
+// around the first child (the center cell is intentionally left empty).
+const HOVER_ZONES = 8;
+
 export function HeroVisual({ src, alt }: HeroVisualProps) {
   return (
     <div className="relative mx-auto w-full max-w-md lg:mr-0 lg:ml-auto">
@@ -19,22 +23,27 @@ export function HeroVisual({ src, alt }: HeroVisualProps) {
         className="absolute -top-5 -right-5 -z-10 size-36 rounded-full border border-blue-200/70 bg-blue-100/60 dark:border-blue-900/60 dark:bg-blue-950/40"
       />
 
-      <div className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-2xl shadow-slate-950/10 dark:shadow-black/40">
-        <div className="relative aspect-[4/5]">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            priority
-            sizes="(min-width: 1024px) 40vw, (min-width: 640px) 70vw, 90vw"
-            className="object-cover"
-          />
-        
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent"
-          />
+      <div className="hover-3d w-full">
+        <div className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-2xl shadow-slate-950/10 dark:shadow-black/40">
+          <div className="relative aspect-[4/5]">
+            <Image
+              src={src}
+              alt={alt}
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, (min-width: 640px) 70vw, 90vw"
+              className="object-cover"
+            />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-gradient-to-t from-slate-950/35 via-transparent to-transparent"
+            />
+          </div>
         </div>
+
+        {Array.from({ length: HOVER_ZONES }, (_, index) => (
+          <div key={index} aria-hidden="true" />
+        ))}
       </div>
 
       <Card
