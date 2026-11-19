@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/components/dashboard/page-header";
-import { StatsGrid } from "@/components/dashboard/stat-card";
-import { useDashboardStore } from "@/components/dashboard/dashboard-store";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { StatsGrid } from "@/components/dashboard/shared/stat-card";
+import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
 import { getTechnicianStats } from "@/lib/dashboard-data";
 
 export function TechnicianOverview() {

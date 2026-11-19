@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { PageHeader } from "@/components/dashboard/page-header";
-import { ServiceForm } from "@/components/dashboard/service-form";
-import { useDashboardStore } from "@/components/dashboard/dashboard-store";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { ServiceForm } from "@/components/dashboard/shared/service-form";
+import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/toast";
 import { buildServiceData } from "@/lib/service-payload";

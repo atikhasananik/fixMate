@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AdminServices } from "@/components/dashboard/admin-services";
+import { AdminServices } from "@/components/dashboard/admin/admin-services";
 
 export const metadata: Metadata = {
   title: "Service Approval",

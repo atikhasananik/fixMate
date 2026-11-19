@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TechnicianServices } from "@/components/dashboard/technician-services";
+import { TechnicianServices } from "@/components/dashboard/technician/technician-services";
 
 export const metadata: Metadata = {
   title: "My Services",

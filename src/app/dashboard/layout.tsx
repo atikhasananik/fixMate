@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
-import { DashboardSidebar } from "@/components/dashboard/dashboard-sidebar";
-import { DashboardStoreProvider } from "@/components/dashboard/dashboard-store";
-import { DashboardTopbar } from "@/components/dashboard/dashboard-topbar";
+import { DashboardSidebar } from "@/components/dashboard/shared/dashboard-sidebar";
+import { DashboardStoreProvider } from "@/components/dashboard/shared/dashboard-store";
+import { DashboardTopbar } from "@/components/dashboard/shared/dashboard-topbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { getDashboardSession, toDashboardViewer } from "@/lib/dashboard-session";
 

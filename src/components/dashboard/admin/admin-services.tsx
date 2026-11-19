@@ -19,12 +19,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
-import { EmptyState } from "@/components/dashboard/empty-state";
-import { PageHeader } from "@/components/dashboard/page-header";
-import { ServiceCell } from "@/components/dashboard/service-thumbnail";
-import { StatusBadge } from "@/components/dashboard/status-badge";
-import { TableCard } from "@/components/dashboard/table-card";
-import { useDashboardStore } from "@/components/dashboard/dashboard-store";
+import { EmptyState } from "@/components/dashboard/shared/empty-state";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { ServiceCell } from "@/components/dashboard/shared/service-thumbnail";
+import { StatusBadge } from "@/components/dashboard/shared/status-badge";
+import { TableCard } from "@/components/dashboard/shared/table-card";
+import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
 import { APPROVAL_STATUS_OPTIONS } from "@/lib/dashboard-data";
 import { formatCurrency } from "@/lib/format";
 import type {

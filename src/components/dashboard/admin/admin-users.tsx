@@ -19,10 +19,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
-import { EmptyState } from "@/components/dashboard/empty-state";
-import { PageHeader } from "@/components/dashboard/page-header";
-import { TableCard } from "@/components/dashboard/table-card";
-import { useDashboardStore } from "@/components/dashboard/dashboard-store";
+import { EmptyState } from "@/components/dashboard/shared/empty-state";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { TableCard } from "@/components/dashboard/shared/table-card";
+import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
 import { formatDate } from "@/lib/format";
 import { ROLE_LABELS, getInitials } from "@/lib/nav";
 import type { PlatformUser, UserRole } from "@/types/type";

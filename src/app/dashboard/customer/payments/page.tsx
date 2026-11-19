@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CreditCard } from "lucide-react";
-import { EmptyState } from "@/components/dashboard/empty-state";
-import { PageHeader } from "@/components/dashboard/page-header";
+import { EmptyState } from "@/components/dashboard/shared/empty-state";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
 
 export const metadata: Metadata = {
   title: "Payment History",
