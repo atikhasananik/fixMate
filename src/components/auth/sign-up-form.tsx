@@ -1,9 +1,16 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, UserRound, Wrench } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  ImagePlus,
+  Loader2,
+  UserRound,
+  Wrench,
+} from "lucide-react";
 import { AuthPageShell } from "@/components/auth/auth-page-shell";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +28,14 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "@/components/ui/toast";
 import { signUp } from "@/lib/auth-client";
+import { uploadToImgBB } from "@/lib/imgbb";
 import { DASHBOARD_PATHS } from "@/lib/nav";
-import { PASSWORD_MIN_LENGTH, validateSignUp } from "@/lib/validation";
+import {
+  MAX_SERVICE_IMAGE_BYTES,
+  PASSWORD_MIN_LENGTH,
+  SERVICE_IMAGE_TYPES,
+  validateSignUp,
+} from "@/lib/validation";
 import type {
   RoleOption,
   SignUpErrors,
@@ -50,6 +63,7 @@ const INITIAL_VALUES: SignUpValues = {
   email: "",
   password: "",
   role: "customer",
+  image: "",
 };
 
 export function SignUpForm() {
@@ -58,16 +72,22 @@ export function SignUpForm() {
   const [errors, setErrors] = useState<SignUpErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  /** Local data URL shown instantly while the ImgBB upload runs. */
+  const [imagePreview, setImagePreview] = useState("");
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  /** Ignores responses from uploads the user replaced mid-flight. */
+  const uploadIdRef = useRef(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function setField<K extends keyof SignUpValues>(
     field: K,
-    value: SignUpValues[K]
+    value: SignUpValues[K],
   ) {
     setValues((previous) => ({ ...previous, [field]: value }));
 
     // Clear the error as soon as the user edits the field again.
     setErrors((previous) =>
-      previous[field] ? { ...previous, [field]: undefined } : previous
+      previous[field] ? { ...previous, [field]: undefined } : previous,
     );
   }
 
@@ -76,10 +96,102 @@ export function SignUpForm() {
     setField(name as keyof SignUpValues, value);
   }
 
+  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    // Allow picking the same file again after an error.
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    if (
+      !SERVICE_IMAGE_TYPES.includes(
+        file.type as (typeof SERVICE_IMAGE_TYPES)[number],
+      )
+    ) {
+      setErrors((previous) => ({
+        ...previous,
+        image: "Use a PNG, JPEG, or WebP image.",
+      }));
+      return;
+    }
+
+    if (file.size > MAX_SERVICE_IMAGE_BYTES) {
+      setErrors((previous) => ({
+        ...previous,
+        image: "The image must be 5 MB or smaller.",
+      }));
+      return;
+    }
+
+    setErrors((previous) => ({ ...previous, image: undefined }));
+    setIsUploadingImage(true);
+
+    const currentUploadId = ++uploadIdRef.current;
+
+    // Show the picked file right away; the ImgBB URL replaces it below.
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (
+        currentUploadId === uploadIdRef.current &&
+        typeof reader.result === "string"
+      ) {
+        setImagePreview(reader.result);
+      }
+    };
+
+    reader.readAsDataURL(file);
+
+    uploadToImgBB(file)
+      .then((url) => {
+        if (currentUploadId !== uploadIdRef.current) {
+          return;
+        }
+        // field te img ar url add hoche  imgbb.ts theke img url astese
+        setField("image", url);
+      })
+      .catch((error: unknown) => {
+        if (currentUploadId !== uploadIdRef.current) {
+          return;
+        }
+
+        // Never leave a preview for an image that was not saved.
+        setImagePreview("");
+        setField("image", "");
+        setErrors((previous) => ({
+          ...previous,
+          image:
+            error instanceof Error
+              ? error.message
+              : "ImgBB couldn't upload that image. Please try again.",
+        }));
+        toast.add({
+          type: "error",
+          title: "Couldn't upload your image",
+          description:
+            "Please choose the image again, or continue without one.",
+        });
+      })
+      .finally(() => {
+        if (currentUploadId === uploadIdRef.current) {
+          setIsUploadingImage(false);
+        }
+      });
+  }
+
+  function handleRemoveImage() {
+    uploadIdRef.current += 1;
+    setIsUploadingImage(false);
+    setImagePreview("");
+    setField("image", "");
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (isSubmitting) {
+    if (isSubmitting || isUploadingImage) {
       return;
     }
 
@@ -100,6 +212,7 @@ export function SignUpForm() {
       email: values.email.trim(),
       password: values.password,
       role: values.role,
+      image: values.image || undefined,
     });
 
     if (error) {
@@ -107,8 +220,7 @@ export function SignUpForm() {
       toast.add({
         type: "error",
         title: "Couldn't create your account",
-        description:
-          error.message ?? "Something went wrong. Please try again.",
+        description: error.message ?? "Something went wrong. Please try again.",
       });
       return;
     }
@@ -141,6 +253,83 @@ export function SignUpForm() {
     >
       <form noValidate onSubmit={handleSubmit}>
         <FieldGroup>
+          <Field data-invalid={Boolean(errors.image)}>
+            <FieldLabel htmlFor="image">Profile photo</FieldLabel>
+
+            <div className="flex items-center gap-4">
+              <div
+                aria-hidden="true"
+                className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/70 bg-slate-50 bg-cover bg-center text-muted-foreground dark:bg-slate-900"
+                style={
+                  imagePreview
+                    ? { backgroundImage: `url(${imagePreview})` }
+                    : undefined
+                }
+              >
+                {imagePreview ? null : isUploadingImage ? (
+                  <Loader2 className="size-5 animate-spin" />
+                ) : (
+                  <ImagePlus className="size-5" />
+                )}
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isUploadingImage}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="h-9 rounded-lg px-3"
+                  >
+                    {isUploadingImage ? (
+                      <>
+                        <Loader2 className="animate-spin" aria-hidden="true" />
+                        Uploading…
+                      </>
+                    ) : imagePreview ? (
+                      "Change image"
+                    ) : (
+                      "Choose image"
+                    )}
+                  </Button>
+
+                  {imagePreview && !isUploadingImage ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemoveImage}
+                      className="h-9 rounded-lg px-3 text-muted-foreground hover:text-foreground"
+                    >
+                      Remove
+                    </Button>
+                  ) : null}
+                </div>
+
+                <input
+                  ref={fileInputRef}
+                  id="image"
+                  name="image-file"
+                  type="file"
+                  accept={SERVICE_IMAGE_TYPES.join(",")}
+                  onChange={handleImageChange}
+                  disabled={isUploadingImage}
+                  aria-invalid={Boolean(errors.image)}
+                  aria-describedby="image-description"
+                  className="hidden"
+                />
+
+                <FieldDescription id="image-description">
+                  Optional. PNG, JPEG, or WebP up to 5 MB — uploaded to ImgBB.
+                </FieldDescription>
+              </div>
+            </div>
+
+            <FieldError id="image-error">{errors.image}</FieldError>
+          </Field>
+
           <Field data-invalid={Boolean(errors.name)}>
             <FieldLabel htmlFor="name">Full name</FieldLabel>
             <Input
@@ -254,13 +443,18 @@ export function SignUpForm() {
 
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUploadingImage}
             className="h-11 w-full rounded-xl bg-blue-600 text-sm font-medium text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700"
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="animate-spin" aria-hidden="true" />
                 Creating account…
+              </>
+            ) : isUploadingImage ? (
+              <>
+                <Loader2 className="animate-spin" aria-hidden="true" />
+                Uploading image…
               </>
             ) : (
               "Create account"

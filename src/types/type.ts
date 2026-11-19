@@ -22,6 +22,8 @@ export type SignUpValues = {
   email: string;
   password: string;
   role: SignUpRole;
+  /** ImgBB URL for the profile picture; empty when the user skips it. */
+  image: string;
 };
 
 export type SignUpErrors = Partial<Record<keyof SignUpValues, string>>;
