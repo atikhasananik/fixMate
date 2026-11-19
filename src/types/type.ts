@@ -249,7 +249,7 @@ export type ServiceListing = {
   estimatedDuration: string;
   serviceMode: ServiceMode;
   serviceArea: string;
-  /** Data URL in the UI prototype; becomes an ImgBB URL once uploads are wired. */
+  /** ImgBB URL, stored when the technician uploads the service image. */
   image?: string;
   technicianId: string;
   technicianName: string;

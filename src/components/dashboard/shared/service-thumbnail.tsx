@@ -3,8 +3,8 @@ import { cn } from "cn";
 import type { ServiceCellProps, ServiceThumbnailProps } from "@/types/type";
 
 /**
- * Image thumbnail with an icon fallback. Service images are optional until
- * ImgBB uploads are connected, so most sample rows use the fallback tile.
+ * Image thumbnail with an icon fallback. Service images come from ImgBB, so
+ * older rows created before uploads were wired still show the fallback tile.
  */
 export function ServiceThumbnail({
   title,

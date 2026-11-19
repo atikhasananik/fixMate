@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { ImagePlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
+import { uploadToImgBB } from "@/lib/imgbb";
 import {
   SERVICE_CATEGORIES,
   SERVICE_MODE_LABELS,
@@ -59,7 +60,9 @@ export function ServiceForm({
     ...initialValues,
   });
   const [errors, setErrors] = useState<ServiceFormErrors>({});
-  const [isReadingImage, setIsReadingImage] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  /** Ignores responses from uploads the user replaced mid-flight. */
+  const uploadIdRef = useRef(0);
 
   function setField<K extends keyof ServiceFormValues>(
     field: K,
@@ -102,33 +105,67 @@ export function ServiceForm({
       return;
     }
 
-    // ImgBB is not installed yet, so the preview is stored as a data URL in
-    // the in-memory store. Swap this for the ImgBB upload call later.
-    setIsReadingImage(true);
+    setErrors((previous) => ({ ...previous, image: undefined }));
+    setIsUploadingImage(true);
+
+    const currentUploadId = ++uploadIdRef.current;
+
+    // Show the picked file right away; the ImgBB URL replaces it below.
     const reader = new FileReader();
 
     reader.onload = () => {
-      setIsReadingImage(false);
-
-      if (typeof reader.result === "string") {
+      if (
+        currentUploadId === uploadIdRef.current &&
+        typeof reader.result === "string"
+      ) {
         setField("image", reader.result);
       }
     };
 
-    reader.onerror = () => {
-      setIsReadingImage(false);
-      toast.add({
-        type: "error",
-        title: "Couldn't read that image",
-        description: "Please choose the file again.",
-      });
-    };
-
     reader.readAsDataURL(file);
+
+    uploadToImgBB(file)
+      .then((url) => {
+        if (currentUploadId !== uploadIdRef.current) {
+          return;
+        }
+
+        setField("image", url);
+      })
+      .catch((error: unknown) => {
+        if (currentUploadId !== uploadIdRef.current) {
+          return;
+        }
+
+        // Never keep a local preview for an image that wasn't uploaded.
+        setField("image", "");
+        setErrors((previous) => ({
+          ...previous,
+          image:
+            error instanceof Error
+              ? error.message
+              : "ImgBB couldn't upload that image. Please try again.",
+        }));
+        toast.add({
+          type: "error",
+          title: "Couldn't upload your image",
+          description:
+            "Please choose the image again, or try a different file.",
+        });
+      })
+      .finally(() => {
+        if (currentUploadId === uploadIdRef.current) {
+          setIsUploadingImage(false);
+        }
+      });
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (isUploadingImage) {
+      return;
+    }
 
     const nextErrors = validateServiceForm(values, {
       requireImage: mode === "create",
@@ -318,7 +355,7 @@ export function ServiceForm({
                   : undefined
               }
             >
-              {values.image ? null : isReadingImage ? (
+              {values.image ? null : isUploadingImage ? (
                 <Loader2 className="size-5 animate-spin" />
               ) : (
                 <ImagePlus className="size-5" />
@@ -337,8 +374,7 @@ export function ServiceForm({
                 className="h-10 cursor-pointer file:mr-3"
               />
               <FieldDescription id="image-description">
-                PNG, JPEG, or WebP up to 5 MB. Uploads will move to ImgBB
-                once it is connected.
+                PNG, JPEG, or WebP up to 5 MB — uploaded to ImgBB.
               </FieldDescription>
             </div>
           </div>
@@ -378,13 +414,13 @@ export function ServiceForm({
         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-end">
           <Button
             type="submit"
-            disabled={isReadingImage}
+            disabled={isUploadingImage}
             className="h-10 rounded-xl bg-blue-600 px-4 text-sm font-medium text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 dark:bg-blue-500 dark:text-slate-950 dark:hover:bg-blue-400"
           >
-            {isReadingImage ? (
+            {isUploadingImage ? (
               <>
                 <Loader2 className="animate-spin" aria-hidden="true" />
-                Reading image…
+                Uploading image…
               </>
             ) : mode === "create" ? (
               "Submit for approval"

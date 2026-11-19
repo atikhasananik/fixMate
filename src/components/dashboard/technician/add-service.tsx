@@ -8,18 +8,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/toast";
 import { buildServiceData } from "@/lib/service-payload";
 import type { ServiceFormValues } from "@/types/type";
+import { postServive } from "@/lib/Action/api/post.data.api";
 
 export function AddService() {
   const router = useRouter();
   const { viewer, addService } = useDashboardStore();
 
-  function handleSubmit(values: ServiceFormValues) {
+ async function handleSubmit(values: ServiceFormValues) {
     // Form state → API body. Technician comes from the session, and the
     // approval/availability/createdAt defaults are set inside the builder.
     const data = buildServiceData(values, viewer);
 
-    addService(data);
-    console.log(data);
+    // addService(data);
+    // console.log(data);
 
     // TODO: swap for the real API once the endpoint exists.
     // const servicePostResult = await fetch("/api/services", {
@@ -27,6 +28,9 @@ export function AddService() {
     //   headers: { "Content-Type": "application/json" },
     //   body: JSON.stringify(data),
     // });
+
+    const servicePostResult = await postServive(data)
+    console.log(servicePostResult);
 
     toast.add({
       type: "success",
