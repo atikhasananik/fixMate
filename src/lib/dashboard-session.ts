@@ -50,6 +50,9 @@ export function toDashboardViewer(
     email: session.user.email,
     image: session.user.image ?? null,
     role: normalizeUserRole(session.user.role),
+    phone: session.user.phone ?? null,
+    area: session.user.area ?? null,
+    bio: session.user.bio ?? null,
     joinedAt: joinedAt.toISOString(),
   };
 }

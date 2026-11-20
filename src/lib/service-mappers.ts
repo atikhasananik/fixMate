@@ -1,5 +1,6 @@
 import type {
   ServiceApiItem,
+  ServiceDetails,
   ServiceMode,
   TechnicianService,
 } from "@/types/type";
@@ -24,5 +25,19 @@ export function toTechnicianService(item: ServiceApiItem): TechnicianService {
     technicianName: item.technicianName,
     approvalStatus: item.approvalStatus ?? "pending",
     isAvailable: item.isAvailable ?? false,
+  };
+}
+
+export function toServiceDetails(item: ServiceApiItem): ServiceDetails {
+  const service = toTechnicianService(item);
+
+  return {
+    service,
+    technician: {
+      name: item.technicianName ?? "",
+      image: item.technicianImage,
+      bio: item.technicianBio,
+      serviceArea: service.serviceArea,
+    },
   };
 }

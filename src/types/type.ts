@@ -271,10 +271,24 @@ export type ServiceApiItem = {
   serviceMode?: string;
   serviceArea?: string;
   technicianName?: string;
+  technicianImage?: string;
+  technicianBio?: string;
   technicianEmail?: string;
   approvalStatus?: ServiceApprovalStatus;
   isAvailable?: boolean;
   createdAt?: string;
+};
+
+export type ServiceTechnician = {
+  name: string;
+  image?: string;
+  bio?: string;
+  serviceArea: string;
+};
+
+export type ServiceDetails = {
+  service: TechnicianService;
+  technician: ServiceTechnician;
 };
 
 /** Normalised service shape used by the technician My Services table. */
@@ -328,6 +342,9 @@ export type DashboardViewer = {
   email: string;
   image?: string | null;
   role: UserRole;
+  phone?: number | null;
+  area?: string | null;
+  bio?: string | null;
   /** ISO date string. */
   joinedAt: string;
 };
