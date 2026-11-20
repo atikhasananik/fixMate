@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Pencil, Plus, Trash2, Wrench } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Pencil, Plus, Trash2, TriangleAlert, Wrench } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,26 +41,58 @@ import { TableCard } from "@/components/dashboard/shared/table-card";
 import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
 import { SERVICE_MODE_LABELS } from "@/lib/dashboard-data";
 import { formatCurrency } from "@/lib/format";
-import type { ServiceFormValues, ServiceListing } from "@/types/type";
+import type {
+  ServiceFormValues,
+  TechnicianService,
+  TechnicianServicesProps,
+} from "@/types/type";
+import { deleteService } from "@/lib/Action/api/delete.data.api";
 
-export function TechnicianServices() {
-  const {
-    viewer,
-    services,
-    updateService,
-    deleteService,
-    setServiceAvailability,
-  } = useDashboardStore();
+export function TechnicianServices({
+  services: initialServices,
+  error,
+}: TechnicianServicesProps) {
+  const router = useRouter();
+  const { viewer } = useDashboardStore();
+  const [services, setServices] = useState(initialServices);
+  const [serverServices, setServerServices] = useState(initialServices);
+  const [editing, setEditing] = useState<TechnicianService | null>(null);
+  const [deleting, setDeleting] = useState<TechnicianService | null>(null);
 
-  const [editing, setEditing] = useState<ServiceListing | null>(null);
-  const [deleting, setDeleting] = useState<ServiceListing | null>(null);
+  // Pick up fresh server data after `router.refresh()` retries a failed load.
+  if (initialServices !== serverServices) {
+    setServerServices(initialServices);
+    setServices(initialServices);
+  }
 
   function handleUpdate(values: ServiceFormValues) {
     if (!editing) {
       return;
     }
 
-    updateService(editing.id, values);
+    setServices((previous) =>
+      previous.map((service) =>
+        service.id === editing.id
+          ? {
+              ...service,
+              title: values.title.trim(),
+              category: values.category,
+              description: values.description.trim(),
+              basePrice: Number(values.basePrice),
+              estimatedDuration: values.estimatedDuration.trim(),
+              serviceMode: values.serviceMode,
+              serviceArea: values.serviceArea.trim(),
+              image: values.image || undefined,
+              // Any edit needs to be reviewed again.
+              approvalStatus: "pending",
+            }
+          : service,
+      ),
+    );
+
+
+    
+
     toast.add({
       type: "success",
       title: "Service updated",
@@ -68,12 +101,16 @@ export function TechnicianServices() {
     setEditing(null);
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleting) {
       return;
     }
+    const deleteServiceByID = await deleteService(deleting.id);
+    if (deleteServiceByID) {
+      router.refresh();
+    }
+    console.log(deleteServiceByID);
 
-    deleteService(deleting.id);
     toast.add({
       type: "success",
       title: "Service deleted",
@@ -82,8 +119,15 @@ export function TechnicianServices() {
     setDeleting(null);
   }
 
-  function handleAvailability(service: ServiceListing, isAvailable: boolean) {
-    setServiceAvailability(service.id, isAvailable);
+  function handleAvailability(
+    service: TechnicianService,
+    isAvailable: boolean,
+  ) {
+    setServices((previous) =>
+      previous.map((item) =>
+        item.id === service.id ? { ...item, isAvailable } : item,
+      ),
+    );
     toast.add({
       type: "success",
       title: isAvailable ? "Service is available" : "Service hidden",
@@ -112,9 +156,28 @@ export function TechnicianServices() {
 
       <TableCard
         title="All services"
-        description="An unavailable service is hidden from customers until you switch it back on."
+        description={
+          error
+            ? "Reload the page to try fetching your services again."
+            : "An unavailable service is hidden from customers until you switch it back on."
+        }
       >
-        {services.length === 0 ? (
+        {error ? (
+          <EmptyState
+            icon={TriangleAlert}
+            title="Couldn't load your services"
+            description={error}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.refresh()}
+              className="mt-2"
+            >
+              Try again
+            </Button>
+          </EmptyState>
+        ) : services.length === 0 ? (
           <EmptyState
             icon={Wrench}
             title="No services yet"
@@ -134,6 +197,7 @@ export function TechnicianServices() {
               <TableRow>
                 <TableHead>Service</TableHead>
                 <TableHead className="hidden md:table-cell">Mode</TableHead>
+                <TableHead className="hidden lg:table-cell">Duration</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Approval</TableHead>
                 <TableHead>Available</TableHead>
@@ -146,13 +210,16 @@ export function TechnicianServices() {
                 <TableRow key={service.id}>
                   <TableCell>
                     <ServiceCell
-                      title={service.title}
-                      category={service.category}
+                      title={service.title || "Untitled service"}
+                      category={service.category || "Uncategorized"}
                       image={service.image}
                     />
                   </TableCell>
                   <TableCell className="hidden whitespace-nowrap md:table-cell">
-                    {SERVICE_MODE_LABELS[service.serviceMode]}
+                    {SERVICE_MODE_LABELS[service.serviceMode] ?? "—"}
+                  </TableCell>
+                  <TableCell className="hidden whitespace-nowrap lg:table-cell">
+                    {service.estimatedDuration || "—"}
                   </TableCell>
                   <TableCell className="whitespace-nowrap font-medium tabular-nums">
                     {formatCurrency(service.basePrice)}

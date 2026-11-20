@@ -315,14 +315,15 @@ export function getCustomerStats(bookings: Booking[]): DashboardStat[] {
       label: "Active jobs",
       value: bookings.filter(
         (booking) =>
-          booking.status === "accepted" || booking.status === "in-progress"
+          booking.status === "accepted" || booking.status === "in-progress",
       ).length,
       icon: Wrench,
       hint: "Accepted or currently being repaired",
     },
     {
       label: "Completed jobs",
-      value: bookings.filter((booking) => booking.status === "completed").length,
+      value: bookings.filter((booking) => booking.status === "completed")
+        .length,
       icon: CalendarCheck,
       hint: "Finished repairs, paid or awaiting payment",
     },
@@ -331,7 +332,7 @@ export function getCustomerStats(bookings: Booking[]): DashboardStat[] {
 
 export function getTechnicianStats(
   services: ServiceListing[],
-  bookings: Booking[]
+  bookings: Booking[],
 ): DashboardStat[] {
   return [
     {
@@ -359,7 +360,7 @@ export function getTechnicianStats(
 
 export function getAdminStats(
   users: PlatformUser[],
-  services: ServiceListing[]
+  services: ServiceListing[],
 ): DashboardStat[] {
   return [
     {
@@ -376,9 +377,8 @@ export function getAdminStats(
     },
     {
       label: "Pending services",
-      value: services.filter(
-        (service) => service.approvalStatus === "pending"
-      ).length,
+      value: services.filter((service) => service.approvalStatus === "pending")
+        .length,
       icon: ClipboardList,
       hint: "Listings waiting for approval",
     },

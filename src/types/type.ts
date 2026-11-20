@@ -258,6 +258,45 @@ export type ServiceListing = {
   createdAt: Date;
 };
 
+/** Raw document returned by `GET /get-services/:email` on the Express API. */
+export type ServiceApiItem = {
+  _id: string;
+  title?: string;
+  category?: string;
+  description?: string;
+  image?: string;
+  basePrice?: number;
+  estimatedDuration?: string;
+  /** API label form: "Home Visit" or "Shop Drop-off". */
+  serviceMode?: string;
+  serviceArea?: string;
+  technicianName?: string;
+  technicianEmail?: string;
+  approvalStatus?: ServiceApprovalStatus;
+  isAvailable?: boolean;
+  createdAt?: string;
+};
+
+/** Normalised service shape used by the technician My Services table. */
+export type TechnicianService = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  image?: string;
+  basePrice: number;
+  estimatedDuration: string;
+  serviceMode: ServiceMode;
+  serviceArea: string;
+  approvalStatus: ServiceApprovalStatus;
+  isAvailable: boolean;
+};
+
+export type TechnicianServicesProps = {
+  services: TechnicianService[];
+  error?: string | null;
+};
+
 export type PlatformUser = {
   id: string;
   name: string;
