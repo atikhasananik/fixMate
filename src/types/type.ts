@@ -255,6 +255,46 @@ export type CustomerBooking = Pick<
   serviceImage?: string;
 };
 
+export type TechnicianBooking = {
+  id: string;
+  technicianEmail: string;
+  customerName: string;
+  phone: string;
+  address: string;
+  preferredDate: string;
+  problemDescription: string;
+  serviceTitle: string;
+  status: BookingStatus;
+  basePrice: number;
+  finalAmount?: number;
+  paymentStatus: PaymentStatus;
+};
+
+export type TechnicianBookingApiDocument = {
+  _id?: string;
+  id?: string;
+  technicianEmail?: string;
+  customerName?: string;
+  phone?: string;
+  customerPhone?: string;
+  address?: string;
+  preferredDate?: string;
+  problemDescription?: string;
+  serviceTitle?: string;
+  status?: BookingStatus;
+  basePrice?: number | string;
+  finalAmount?: number | string;
+  paymentStatus?: PaymentStatus;
+};
+
+export type GetTechnicianBookingRequestsResponse = {
+  message?: string;
+  result?:
+    | TechnicianBookingApiDocument[]
+    | { bookings?: TechnicianBookingApiDocument[] };
+  bookings?: TechnicianBookingApiDocument[];
+};
+
 export type BookingApiDocument = {
   _id?: string;
   id?: string;
@@ -551,21 +591,48 @@ export interface IServiceData {
 
 
 
-export type BookingPayload = {
-  customerEmail: string;
-  customerName: string;
-  technicianEmail: string;
-  technicianName: string;
-  status: BookingStatus;
-  paymentStatus: PaymentStatus;
+export type BookingData = {
   serviceId: string;
   serviceTitle: string;
   serviceImage: string;
   category: string;
   basePrice: number;
-  finalAmount: number;
-  problemDescription: string;
-  preferredDate: string;
-  customerPhone: string;
+  technicianName: string;
+  technicianEmail: string;
+  customerName: string;
+  customerEmail: string;
+  phone: string;
   address: string;
+  preferredDate: string;
+  problemDescription: string;
+  status: "requested";
+  paymentStatus: "unpaid";
+  createdAt: Date;
+};
+
+/** Untrusted client input; the API must derive user and service data itself. */
+export type BookingRequestPayload = {
+  serviceId: string;
+  phone: string;
+  address: string;
+  preferredDate: string;
+  problemDescription: string;
+};
+
+export type BookingRequestValues = Omit<
+  BookingRequestPayload,
+  "serviceId"
+>;
+
+export type BookingRequestErrors = Partial<
+  Record<keyof BookingRequestValues, string>
+>;
+
+export type CreateBookingResponse = {
+  success?: boolean;
+  message?: string;
+  result?: {
+    message?: string;
+    booking?: BookingData;
+  };
 };

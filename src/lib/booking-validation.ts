@@ -1,13 +1,9 @@
-export type BookingRequestValues = {
-  phone: string;
-  address: string;
-  preferredDate: string;
-  problemDescription: string;
-};
+import type {
+  BookingRequestErrors,
+  BookingRequestValues,
+} from "@/types/type";
 
-export type BookingRequestErrors = Partial<
-  Record<keyof BookingRequestValues, string>
->;
+export type { BookingRequestErrors, BookingRequestValues } from "@/types/type";
 
 export function getTodayDateInputValue(now = new Date()): string {
   const year = now.getFullYear();

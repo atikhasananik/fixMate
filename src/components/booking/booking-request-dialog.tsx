@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useState,
+  type ChangeEvent,
+  type FocusEvent,
+  type FormEvent,
+} from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -37,9 +42,12 @@ import {
   getTodayDateInputValue,
   validateBookingRequest,
   type BookingRequestErrors,
-  type BookingRequestValues,
 } from "@/lib/booking-validation";
-import { BookingPayload, ServiceDetails } from "@/types/type";
+import type {
+  BookingRequestPayload,
+  BookingRequestValues,
+  ServiceDetails,
+} from "@/types/type";
 import { useSession } from "@/lib/auth-client";
 
 type BookingRequestDialogProps = {
@@ -55,6 +63,10 @@ const EMPTY_VALUES: BookingRequestValues = {
   problemDescription: "",
 };
 
+type BookingRequestTouched = Partial<
+  Record<keyof BookingRequestValues, boolean>
+>;
+
 const BOOKING_REQUEST_TOAST_ID = "booking-request-submission";
 
 export function BookingRequestDialog({
@@ -67,6 +79,7 @@ export function BookingRequestDialog({
     ...EMPTY_VALUES,
   }));
   const [errors, setErrors] = useState<BookingRequestErrors>({});
+  const [touched, setTouched] = useState<BookingRequestTouched>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState("");
   const today = getTodayDateInputValue();
@@ -74,6 +87,18 @@ export function BookingRequestDialog({
   const { data: session } = useSession();
   const customerName = session?.user.name || "";
   const customerEmail = session?.user.email || "";
+  const validationErrors = validateBookingRequest(values, today);
+  const isFormValid =
+    Boolean(customerName.trim() && customerEmail.trim()) &&
+    Object.keys(validationErrors).length === 0;
+  const visibleErrors = {
+    phone: touched.phone ? errors.phone : undefined,
+    address: touched.address ? errors.address : undefined,
+    preferredDate: touched.preferredDate ? errors.preferredDate : undefined,
+    problemDescription: touched.problemDescription
+      ? errors.problemDescription
+      : undefined,
+  };
 
   function handleOpenChange(nextOpen: boolean) {
     if (isSubmitting) {
@@ -85,6 +110,7 @@ export function BookingRequestDialog({
         ...EMPTY_VALUES,
       });
       setErrors({});
+      setTouched({});
       setSubmissionError("");
     }
 
@@ -105,8 +131,29 @@ export function BookingRequestDialog({
       return;
     }
 
-    setValues((previous) => ({ ...previous, [name]: value }));
-    setErrors((previous) => ({ ...previous, [name]: undefined }));
+    const nextValues = { ...values, [name]: value };
+    setValues(nextValues);
+    if (touched[name]) {
+      setErrors(validateBookingRequest(nextValues, today));
+    }
+  }
+
+  function handleBlur(
+    event: FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    const name = event.currentTarget.name;
+
+    if (
+      name !== "phone" &&
+      name !== "address" &&
+      name !== "preferredDate" &&
+      name !== "problemDescription"
+    ) {
+      return;
+    }
+
+    setTouched((previous) => ({ ...previous, [name]: true }));
+    setErrors(validateBookingRequest(values, today));
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -119,6 +166,12 @@ export function BookingRequestDialog({
     setSubmissionError("");
     const nextErrors = validateBookingRequest(values, today);
     setErrors(nextErrors);
+    setTouched({
+      phone: true,
+      address: true,
+      preferredDate: true,
+      problemDescription: true,
+    });
 
     if (!customerName.trim() || !customerEmail.trim()) {
       toast.add({
@@ -129,30 +182,23 @@ export function BookingRequestDialog({
       return;
     }
 
-    if (Object.keys(nextErrors).length > 0) {
+    if (
+      !customerName.trim() ||
+      !customerEmail.trim() ||
+      Object.keys(nextErrors).length > 0
+    ) {
       return;
     }
 
     setIsSubmitting(true);
 
-    const payload = {
-      customerEmail,
-      customerName,
-      technicianEmail: service.technician.email,
-      technicianName: service.technician.name,
-      status: "requested",
-      paymentStatus: "unpaid",
+    const payload: BookingRequestPayload = {
       serviceId: service.service.id,
-      serviceTitle: service.service.title,
-      serviceImage: service.service.image,
-      category: service.service.category,
-      basePrice: service.service.basePrice,
-      finalAmount: 0,
-      problemDescription: values.problemDescription,
+      phone: values.phone.trim(),
+      address: values.address.trim(),
       preferredDate: values.preferredDate,
-      customerPhone: values.phone,
-      address: values.address,
-    } as BookingPayload;
+      problemDescription: values.problemDescription.trim(),
+    };
 
     toast.add({
       id: BOOKING_REQUEST_TOAST_ID,
@@ -182,6 +228,7 @@ export function BookingRequestDialog({
         ...EMPTY_VALUES,
       });
       setErrors({});
+      setTouched({});
       onOpenChange(false);
       toast.update(BOOKING_REQUEST_TOAST_ID, {
         type: "success",
@@ -280,7 +327,7 @@ export function BookingRequestDialog({
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field data-invalid={Boolean(errors.phone)}>
+                  <Field data-invalid={Boolean(visibleErrors.phone)}>
                     <FieldLabel htmlFor="booking-phone">
                       <Phone aria-hidden="true" />
                       Phone number
@@ -293,19 +340,21 @@ export function BookingRequestDialog({
                       autoComplete="tel"
                       placeholder="Enter your phone number"
                       onChange={handleChange}
-                      aria-invalid={Boolean(errors.phone)}
+                      onBlur={handleBlur}
+                      value={values.phone}
+                      aria-invalid={Boolean(visibleErrors.phone)}
                       aria-describedby={
-                        errors.phone ? "booking-phone-error" : undefined
+                        visibleErrors.phone ? "booking-phone-error" : undefined
                       }
                       required
                       disabled={isSubmitting}
                     />
                     <FieldError id="booking-phone-error">
-                      {errors.phone}
+                      {visibleErrors.phone}
                     </FieldError>
                   </Field>
 
-                  <Field data-invalid={Boolean(errors.address)}>
+                  <Field data-invalid={Boolean(visibleErrors.address)}>
                     <FieldLabel htmlFor="booking-address">
                       <MapPin aria-hidden="true" />
                       Service address
@@ -317,15 +366,18 @@ export function BookingRequestDialog({
                       placeholder="Enter the address for this repair"
                       value={values.address}
                       onChange={handleChange}
-                      aria-invalid={Boolean(errors.address)}
+                      onBlur={handleBlur}
+                      aria-invalid={Boolean(visibleErrors.address)}
                       aria-describedby={
-                        errors.address ? "booking-address-error" : undefined
+                        visibleErrors.address
+                          ? "booking-address-error"
+                          : undefined
                       }
                       required
                       disabled={isSubmitting}
                     />
                     <FieldError id="booking-address-error">
-                      {errors.address}
+                      {visibleErrors.address}
                     </FieldError>
                   </Field>
                 </div>
@@ -342,7 +394,7 @@ export function BookingRequestDialog({
                 Repair details
               </h3>
               <FieldGroup>
-                <Field data-invalid={Boolean(errors.preferredDate)}>
+                <Field data-invalid={Boolean(visibleErrors.preferredDate)}>
                   <FieldLabel htmlFor="booking-date">
                     <CalendarDays aria-hidden="true" />
                     Preferred date
@@ -354,9 +406,10 @@ export function BookingRequestDialog({
                     min={today}
                     value={values.preferredDate}
                     onChange={handleChange}
-                    aria-invalid={Boolean(errors.preferredDate)}
+                    onBlur={handleBlur}
+                    aria-invalid={Boolean(visibleErrors.preferredDate)}
                     aria-describedby={
-                      errors.preferredDate
+                      visibleErrors.preferredDate
                         ? "booking-date-error"
                         : "booking-date-help"
                     }
@@ -367,11 +420,11 @@ export function BookingRequestDialog({
                     Choose today or a date in the future.
                   </FieldDescription>
                   <FieldError id="booking-date-error">
-                    {errors.preferredDate}
+                    {visibleErrors.preferredDate}
                   </FieldError>
                 </Field>
 
-                <Field data-invalid={Boolean(errors.problemDescription)}>
+                <Field data-invalid={Boolean(visibleErrors.problemDescription)}>
                   <FieldLabel htmlFor="booking-problem">
                     Describe the repair issue
                   </FieldLabel>
@@ -381,12 +434,13 @@ export function BookingRequestDialog({
                     placeholder="Tell the technician what is happening and when it started."
                     value={values.problemDescription}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     minLength={20}
                     maxLength={2000}
                     rows={4}
-                    aria-invalid={Boolean(errors.problemDescription)}
+                    aria-invalid={Boolean(visibleErrors.problemDescription)}
                     aria-describedby={
-                      errors.problemDescription
+                      visibleErrors.problemDescription
                         ? "booking-problem-error"
                         : "booking-problem-help"
                     }
@@ -398,7 +452,7 @@ export function BookingRequestDialog({
                     characters
                   </FieldDescription>
                   <FieldError id="booking-problem-error">
-                    {errors.problemDescription}
+                    {visibleErrors.problemDescription}
                   </FieldError>
                 </Field>
               </FieldGroup>
@@ -425,7 +479,7 @@ export function BookingRequestDialog({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isFormValid}
               className="bg-blue-600 text-white hover:bg-blue-700"
             >
               {isSubmitting ? (

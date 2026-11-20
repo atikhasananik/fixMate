@@ -1,28 +1,38 @@
 import type { Metadata } from "next";
-import { Inbox } from "lucide-react";
-import { EmptyState } from "@/components/dashboard/shared/empty-state";
-import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { BookingManagement } from "@/components/dashboard/technician/booking-management";
+import { getTechnicianBookingRequests } from "@/lib/Action/api/get.data.api";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import type { TechnicianBooking } from "@/types/type";
 
 export const metadata: Metadata = {
   title: "Manage Requests",
 };
 
 export default async function TechnicianRequestsPage() {
-  // const getBookingRequestData = await 
-  return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Manage Requests"
-        description="Incoming repair requests will be listed here so you can accept or reject them."
-      />
+  const session = await auth.api.getSession({ headers: await headers() });
+  const email = session?.user.email;
 
-      <div className="rounded-xl border border-border/70 bg-card shadow-sm">
-        <EmptyState
-          icon={Inbox}
-          title="Request management is coming soon"
-          description="Accepting, rejecting, and updating job progress will be wired to the bookings API."
-        />
-      </div>
-    </div>
-  );
+  if (!email) {
+    return (
+      <BookingManagement
+        bookings={[]}
+        error="Your technician account could not be verified. Please sign in again."
+      />
+    );
+  }
+
+  let bookings: TechnicianBooking[] = [];
+  let errorMessage: string | null = null;
+
+  try {
+    bookings = await getTechnicianBookingRequests(email);
+  } catch (error) {
+    errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Please try again in a moment.";
+  }
+
+  return <BookingManagement bookings={bookings} error={errorMessage} />;
 }
