@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Sparkles, TriangleAlert, Wrench } from "lucide-react";
+import { Search, Sparkles, TriangleAlert, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/dashboard/shared/empty-state";
@@ -8,6 +8,7 @@ import { ServiceCard } from "@/components/services/service-card";
 import { ServicesToolbar } from "@/components/services/services-toolbar";
 import { getAllServiceData } from "@/lib/Action/api/get.data.api";
 import { toTechnicianService } from "@/lib/service-mappers";
+import { readServiceParam } from "@/lib/services-query";
 import type { ServiceApiItem } from "@/types/type";
 
 export const metadata: Metadata = {
@@ -41,7 +42,61 @@ export default async function ServicesPage({
     )
   ).sort((a, b) => a.localeCompare(b));
 
-  const countLabel = `${services.length} ${services.length === 1 ? "service" : "services"}`;
+  const search = readServiceParam(params, "search").trim().toLocaleLowerCase();
+  const category = readServiceParam(params, "category");
+  const mode = readServiceParam(params, "mode");
+  const availability = readServiceParam(params, "availability");
+  const sort = readServiceParam(params, "sort");
+
+  const matchingServices = services.filter((service) => {
+    const matchesSearch =
+      !search ||
+      `${service.title ?? ""} ${service.category ?? ""}`
+        .toLocaleLowerCase()
+        .includes(search);
+    const matchesCategory = !category || service.category === category;
+    const matchesMode =
+      !mode || toTechnicianService(service).serviceMode === mode;
+    const matchesAvailability =
+      !availability ||
+      (availability === "available" && Boolean(service.isAvailable)) ||
+      (availability === "unavailable" && !service.isAvailable);
+
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesMode &&
+      matchesAvailability
+    );
+  });
+
+  if (sort === "oldest") {
+    matchingServices.sort(
+      (a, b) =>
+        new Date(a.createdAt ?? 0).getTime() -
+        new Date(b.createdAt ?? 0).getTime()
+    );
+  } else if (sort === "price-asc") {
+    matchingServices.sort(
+      (a, b) => Number(a.basePrice ?? 0) - Number(b.basePrice ?? 0)
+    );
+  } else if (sort === "price-desc") {
+    matchingServices.sort(
+      (a, b) => Number(b.basePrice ?? 0) - Number(a.basePrice ?? 0)
+    );
+  } else if (sort === "title-asc") {
+    matchingServices.sort((a, b) =>
+      (a.title ?? "").localeCompare(b.title ?? "")
+    );
+  } else {
+    matchingServices.sort(
+      (a, b) =>
+        new Date(b.createdAt ?? 0).getTime() -
+        new Date(a.createdAt ?? 0).getTime()
+    );
+  }
+
+  const countLabel = `${matchingServices.length} ${matchingServices.length === 1 ? "service" : "services"}`;
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
@@ -91,15 +146,23 @@ export default async function ServicesPage({
                 Try again
               </Button>
             </EmptyState>
-          ) : services.length === 0 ? (
+          ) : matchingServices.length === 0 ? (
             <EmptyState
-              icon={Wrench}
-              title="No services available yet"
-              description="Verified technicians are still preparing their listings. Check back soon."
+              icon={services.length === 0 ? Wrench : Search}
+              title={
+                services.length === 0
+                  ? "No services available yet"
+                  : "No matching services found"
+              }
+              description={
+                services.length === 0
+                  ? "Verified technicians are still preparing their listings. Check back soon."
+                  : "Try changing or clearing your search and filters to find more repair services."
+              }
             />
           ) : (
             <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => (
+              {matchingServices.map((service) => (
                 <li key={service._id} className="h-full">
                   <ServiceCard service={toTechnicianService(service)} />
                 </li>

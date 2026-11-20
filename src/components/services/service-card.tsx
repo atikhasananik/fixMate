@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { ArrowUpRight, Clock, Home, Store, Wrench } from "lucide-react";
+import {
+  ArrowUpRight,
+  Clock,
+  Home,
+  MapPin,
+  Store,
+  UserRound,
+  Wrench,
+} from "lucide-react";
 import { cn } from "cn";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -95,6 +103,21 @@ export function ServiceCard({ service }: ServiceCardProps) {
           </span>
         </div>
 
+        <div className="grid gap-2 text-sm text-muted-foreground">
+          <span className="inline-flex min-w-0 items-center gap-2">
+            <MapPin className="size-4 shrink-0" aria-hidden="true" />
+            <span className="truncate">
+              {service.serviceArea || "Service area not specified"}
+            </span>
+          </span>
+          <span className="inline-flex min-w-0 items-center gap-2">
+            <UserRound className="size-4 shrink-0" aria-hidden="true" />
+            <span className="truncate">
+              {service.technicianName || "Technician details unavailable"}
+            </span>
+          </span>
+        </div>
+
         <div className="mt-auto flex items-end justify-between gap-2 border-t border-border/60 pt-3">
           <div>
             <span className="text-xs text-muted-foreground">Starting at</span>
@@ -102,15 +125,10 @@ export function ServiceCard({ service }: ServiceCardProps) {
               {formatCurrency(service.basePrice)}
             </p>
           </div>
-          {service.serviceArea ? (
-            <span className="max-w-32 truncate text-xs text-muted-foreground">
-              {service.serviceArea}
-            </span>
-          ) : null}
         </div>
 
         <Button
-          render={<Link href={`/service/${service.id}`} />}
+          render={<Link href={`/services/${service.id}`} />}
           className="h-10 w-full justify-between rounded-xl bg-blue-600 px-4 text-white shadow-sm hover:bg-blue-700 active:bg-blue-800"
         >
           <span className="inline-flex items-center gap-2">

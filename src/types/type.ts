@@ -288,6 +288,7 @@ export type TechnicianService = {
   estimatedDuration: string;
   serviceMode: ServiceMode;
   serviceArea: string;
+  technicianName?: string;
   approvalStatus: ServiceApprovalStatus;
   isAvailable: boolean;
 };

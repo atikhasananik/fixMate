@@ -21,6 +21,7 @@ export function toTechnicianService(item: ServiceApiItem): TechnicianService {
     estimatedDuration: item.estimatedDuration ?? "",
     serviceMode: toServiceMode(item.serviceMode),
     serviceArea: item.serviceArea ?? "",
+    technicianName: item.technicianName,
     approvalStatus: item.approvalStatus ?? "pending",
     isAvailable: item.isAvailable ?? false,
   };
