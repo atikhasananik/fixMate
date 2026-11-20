@@ -297,6 +297,20 @@ export type TechnicianServicesProps = {
   error?: string | null;
 };
 
+/* -------------------------------------------------------------------------- */
+/*                            Public services page                            */
+/* -------------------------------------------------------------------------- */
+
+export type ServiceCardProps = {
+  service: TechnicianService;
+};
+
+export type ServicesToolbarProps = {
+  categories: string[];
+  /** Raw route search params, used to read and preserve query values. */
+  searchParams: Record<string, string | string[] | undefined>;
+};
+
 export type PlatformUser = {
   id: string;
   name: string;

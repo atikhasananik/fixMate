@@ -9,15 +9,30 @@ type GetServicesResponse = {
 
 /** Fetches the services that belong to one technician from the Express API. */
 export async function getServiceData(
-  technicianEmail: string
+  technicianEmail: string,
 ): Promise<ServiceApiItem[]> {
   const res = await fetch(
     `${BASE_URL}/get-services/${encodeURIComponent(technicianEmail)}`,
-    { cache: "no-store" }
+    { cache: "no-store" },
   );
 
   if (!res.ok) {
     throw new Error(`Couldn't load your services (${res.status}).`);
+  }
+
+  const data = (await res.json()) as GetServicesResponse;
+
+  return Array.isArray(data.result) ? data.result : [];
+}
+
+// Every service listing, used by the public services page.
+export async function getAllServiceData(): Promise<ServiceApiItem[]> {
+  const res = await fetch(`${BASE_URL}/get-all-services`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Couldn't load services (${res.status}).`);
   }
 
   const data = (await res.json()) as GetServicesResponse;

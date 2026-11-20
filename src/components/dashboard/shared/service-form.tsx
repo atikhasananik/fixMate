@@ -70,7 +70,7 @@ export function ServiceForm({
 }: ServiceFormProps) {
   const isEditing = service != null;
   const [values, setValues] = useState<ServiceFormValues>(() =>
-    service ? toFormValues(service) : { ...EMPTY_VALUES }
+    service ? toFormValues(service) : { ...EMPTY_VALUES },
   );
   const [errors, setErrors] = useState<ServiceFormErrors>({});
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -79,16 +79,16 @@ export function ServiceForm({
 
   function setField<K extends keyof ServiceFormValues>(
     field: K,
-    value: ServiceFormValues[K]
+    value: ServiceFormValues[K],
   ) {
     setValues((previous) => ({ ...previous, [field]: value }));
     setErrors((previous) =>
-      previous[field] ? { ...previous, [field]: undefined } : previous
+      previous[field] ? { ...previous, [field]: undefined } : previous,
     );
   }
 
   function handleChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = event.target;
     setField(name as keyof ServiceFormValues, value);
@@ -102,7 +102,11 @@ export function ServiceForm({
       return;
     }
 
-    if (!SERVICE_IMAGE_TYPES.includes(file.type as (typeof SERVICE_IMAGE_TYPES)[number])) {
+    if (
+      !SERVICE_IMAGE_TYPES.includes(
+        file.type as (typeof SERVICE_IMAGE_TYPES)[number],
+      )
+    ) {
       setErrors((previous) => ({
         ...previous,
         image: "Use a PNG, JPEG, or WebP image.",
@@ -296,9 +300,7 @@ export function ServiceForm({
               onChange={handleChange}
               aria-invalid={Boolean(errors.estimatedDuration)}
               aria-describedby={
-                errors.estimatedDuration
-                  ? "estimatedDuration-error"
-                  : undefined
+                errors.estimatedDuration ? "estimatedDuration-error" : undefined
               }
               className="h-10 px-3"
             />
@@ -331,8 +333,8 @@ export function ServiceForm({
               </SelectContent>
             </Select>
             <FieldDescription>
-              Choose whether you travel to the customer or they drop the
-              device off.
+              Choose whether you travel to the customer or they drop the device
+              off.
             </FieldDescription>
           </Field>
 
