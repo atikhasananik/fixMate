@@ -24,14 +24,6 @@ interface CustomerBookingsActionProps {
   serviceTitle: string;
 }
 
-type UpdateBookingStatusResponse = {
-  success?: boolean;
-  message?: string;
-  result?: {
-    message?: string;
-  };
-};
-
 export default function CustomerBookingsAction({
   currentStatus,
   id,
@@ -51,10 +43,7 @@ export default function CustomerBookingsAction({
     setIsUpdating(true);
 
     try {
-      const response = (await updateBookingStatus(
-        id,
-        "cancelled",
-      )) as UpdateBookingStatusResponse;
+      const response = await updateBookingStatus(id, "cancelled");
 
       if (response.success === false) {
         throw new Error(

@@ -1,16 +1,13 @@
 import { BASE_URL } from "./post.data.api";
 import type {
+  BookingApiDocument,
   BookingStatus,
   CustomerBooking,
-  PaymentStatus,
+  GetBookingsResponse,
+  GetServicesResponse,
+  GetSingleServiceResponse,
   ServiceApiItem,
 } from "@/types/type";
-
-type GetServicesResponse = {
-  status?: number;
-  message?: string;
-  result?: ServiceApiItem[];
-};
 
 /** Fetches the services that belong to one technician from the Express API. */
 export async function getServiceData(
@@ -56,11 +53,7 @@ export const getSingleServiceData = async (
     throw new Error(`Couldn't load services (${res.status}).`);
   }
 
-  const data = (await res.json()) as {
-    status?: number;
-    message?: string;
-    result?: ServiceApiItem | ServiceApiItem[];
-  };
+  const data = (await res.json()) as GetSingleServiceResponse;
 
   if (Array.isArray(data.result)) {
     return data.result.find((service) => service._id === id) ?? null;
@@ -69,25 +62,6 @@ export const getSingleServiceData = async (
   return data.result ?? null;
 };
 
-
-type BookingApiDocument = {
-  _id?: string;
-  id?: string;
-  serviceTitle?: string;
-  serviceImage?: string;
-  category?: string;
-  technicianName?: string;
-  preferredDate?: string;
-  basePrice?: number | string;
-  finalAmount?: number | string;
-  status?: BookingStatus;
-  paymentStatus?: PaymentStatus;
-};
-
-type GetBookingsResponse = {
-  message?: string;
-  result?: BookingApiDocument[] | { bookings?: BookingApiDocument[] };
-};
 
 const BOOKING_STATUSES: BookingStatus[] = [
   "requested",

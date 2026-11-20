@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   title: "Manage Requests",
 };
 
-export default function TechnicianRequestsPage() {
+export default async function TechnicianRequestsPage() {
+  // const getBookingRequestData = await 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader

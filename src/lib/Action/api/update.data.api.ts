@@ -1,5 +1,9 @@
 import { BASE_URL } from "./post.data.api";
 import type { ServiceFields } from "@/lib/service-payload";
+import type {
+  BookingStatus,
+  UpdateBookingStatusResponse,
+} from "@/types/type";
 
 export const updateServiceData = async (
   id: string,
@@ -20,7 +24,10 @@ export const updateServiceData = async (
   return res.json();
 };
 
-export const updateBookingStatus = async (id: string, status: string) => {
+export const updateBookingStatus = async (
+  id: string,
+  status: BookingStatus,
+): Promise<UpdateBookingStatusResponse> => {
   const res = await fetch(`${BASE_URL}/update-status/${id}`, {
     method: "PATCH",
     headers: {
@@ -33,5 +40,5 @@ export const updateBookingStatus = async (id: string, status: string) => {
     throw new Error(`Couldn't update the service (${res.status}).`);
   }
 
-  return res.json();
+  return (await res.json()) as UpdateBookingStatusResponse;
 };

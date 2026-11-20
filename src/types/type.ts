@@ -255,6 +255,33 @@ export type CustomerBooking = Pick<
   serviceImage?: string;
 };
 
+export type BookingApiDocument = {
+  _id?: string;
+  id?: string;
+  serviceTitle?: string;
+  serviceImage?: string;
+  category?: string;
+  technicianName?: string;
+  preferredDate?: string;
+  basePrice?: number | string;
+  finalAmount?: number | string;
+  status?: BookingStatus;
+  paymentStatus?: PaymentStatus;
+};
+
+export type GetBookingsResponse = {
+  message?: string;
+  result?: BookingApiDocument[] | { bookings?: BookingApiDocument[] };
+};
+
+export type UpdateBookingStatusResponse = {
+  success?: boolean;
+  message?: string;
+  result?: {
+    message?: string;
+  };
+};
+
 export type ServiceListing = {
   id: string;
   title: string;
@@ -292,6 +319,18 @@ export type ServiceApiItem = {
   approvalStatus?: ServiceApprovalStatus;
   isAvailable?: boolean;
   createdAt?: string;
+};
+
+export type GetServicesResponse = {
+  status?: number;
+  message?: string;
+  result?: ServiceApiItem[];
+};
+
+export type GetSingleServiceResponse = {
+  status?: number;
+  message?: string;
+  result?: ServiceApiItem | ServiceApiItem[];
 };
 
 export type ServiceTechnician = {
