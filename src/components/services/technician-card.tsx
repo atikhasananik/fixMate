@@ -1,15 +1,6 @@
-import { MapPin, UserRound } from "lucide-react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Mail, MapPin, UserRound } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { ServiceDetails } from "@/types/type";
 
@@ -30,9 +21,7 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
   return (
     <Card className="gap-0 rounded-2xl border border-border/70 shadow-sm">
       <CardHeader className="px-5 pt-5 sm:px-6 sm:pt-6">
-        <CardTitle className="text-xl font-semibold">
-          Your technician
-        </CardTitle>
+        <CardTitle className="text-xl font-semibold">Your technician</CardTitle>
       </CardHeader>
       <CardContent className="px-5 pb-5 sm:px-6 sm:pb-6">
         <div className="flex items-center gap-4">
@@ -46,19 +35,20 @@ export function TechnicianCard({ technician }: TechnicianCardProps) {
           </Avatar>
           <div className="min-w-0">
             <p className="truncate font-semibold text-foreground">{name}</p>
+
+            <div>
+              <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Mail className="size-3.5" aria-hidden="true" />
+                {technician.email || "Location not specified"}
+              </p>
+            </div>
+
             <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground">
               <MapPin className="size-3.5" aria-hidden="true" />
               {technician.serviceArea || "Location not specified"}
             </p>
           </div>
         </div>
-
-        <Separator className="my-5" />
-
-        <p className="text-sm leading-6 text-muted-foreground">
-          {technician.bio ||
-            "Technician profile information has not been provided yet."}
-        </p>
       </CardContent>
     </Card>
   );

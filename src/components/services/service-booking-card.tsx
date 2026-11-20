@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Clock3, Home, Store } from "lucide-react";
+import { Clock3, Home, Store } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,24 +14,31 @@ import { formatCurrency } from "@/lib/format";
 import type { ServiceDetails } from "@/types/type";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { BookingRequestAction } from "@/components/booking/booking-request-action";
 
-type ServiceBookingCardProps = Pick<ServiceDetails, "service">;
+type ServiceBookingCardProps = {
+  service: ServiceDetails;
+};
 
-export async function ServiceBookingCard({ service }: ServiceBookingCardProps) {
+export async function ServiceBookingCard({
+  service: service,
+}: ServiceBookingCardProps) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  const role = session?.user.role;
+  const services = service.service
 
-  const data = await auth.api.getSession({headers: await headers()})
-
-  const role = data?.user.role
-
-  const ModeIcon = service.serviceMode === "home-visit" ? Home : Store;
+  const ModeIcon = services.serviceMode === "home-visit" ? Home : Store;
   const modeLabel =
-    service.serviceMode === "home-visit" ? "Home visit" : "Shop drop-off";
-  // const bookingHref = `/dashboard/customer/bookings?serviceId=${encodeURIComponent(service.id)}`;
+    services.serviceMode === "home-visit" ? "Home visit" : "Shop drop-off";
 
+    console.log(service);
   return (
+    
     <Card className="gap-0 rounded-2xl border border-border/70 shadow-sm">
       <CardHeader className="px-5 pt-5 sm:px-6 sm:pt-6">
-        <CardTitle className="text-lg font-semibold">Book this service</CardTitle>
+        <CardTitle className="text-lg font-semibold">
+          Book this service
+        </CardTitle>
         <p className="text-sm text-muted-foreground">
           Book a trusted professional for your service needs.
         </p>
@@ -41,7 +48,7 @@ export async function ServiceBookingCard({ service }: ServiceBookingCardProps) {
         <div>
           <p className="text-sm text-muted-foreground">Starting at</p>
           <p className="mt-1 text-3xl font-bold tracking-tight text-foreground tabular-nums">
-            {formatCurrency(service.basePrice)}
+            {formatCurrency(services.basePrice)}
           </p>
         </div>
 
@@ -54,7 +61,7 @@ export async function ServiceBookingCard({ service }: ServiceBookingCardProps) {
               Estimated duration
             </dt>
             <dd className="text-right font-medium text-foreground">
-              {service.estimatedDuration || "To be confirmed"}
+              {services.estimatedDuration || "To be confirmed"}
             </dd>
           </div>
           <div className="flex items-center justify-between gap-3 text-sm">
@@ -68,7 +75,7 @@ export async function ServiceBookingCard({ service }: ServiceBookingCardProps) {
           </div>
         </dl>
 
-        {!service.isAvailable ? (
+        {!services.isAvailable ? (
           <Alert>
             <AlertTitle>Currently unavailable</AlertTitle>
             <AlertDescription>
@@ -81,20 +88,37 @@ export async function ServiceBookingCard({ service }: ServiceBookingCardProps) {
 
       <CardFooter className="flex-col items-stretch gap-3 px-5 pb-5 sm:px-6 sm:pb-6">
         {role === "customer" ? (
+          services.isAvailable ? (
+            <BookingRequestAction service={service} />
+          ) : (
+            <Button disabled className="h-11 w-full rounded-xl">
+              Service unavailable
+            </Button>
+          )
+        ) : role ? (
+          <Alert>
+            <AlertTitle>Only customers can request a repair</AlertTitle>
+            <AlertDescription>
+              Sign in with a customer account to request this service.
+            </AlertDescription>
+          </Alert>
+        ) : (
           <Button
-            // render={<Link href={bookingHref} />}
+            render={
+              <Link
+                href={`/sign-in?redirect=${encodeURIComponent(`/services/${services.id}`)}`}
+              />
+            }
             className="h-11 w-full justify-between rounded-xl bg-blue-600 px-4 text-white hover:bg-blue-700"
           >
-            Book This Service
-            <ArrowUpRight className="size-4" aria-hidden="true" />
-          </Button>
-        ) : (
-          <Button disabled className="h-11 w-full rounded-xl">
-            Only available for Customer
+            Sign in to request a repair
+            <span aria-hidden="true">→</span>
           </Button>
         )}
         <p className="text-center text-xs leading-5 text-muted-foreground">
-          You can review your service request before confirming.
+          {role === "customer"
+            ? "You can review your request before submitting."
+            : "Request a repair from a trusted FixMate professional."}
         </p>
       </CardFooter>
     </Card>

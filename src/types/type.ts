@@ -284,6 +284,7 @@ export type ServiceTechnician = {
   image?: string;
   bio?: string;
   serviceArea: string;
+  email: string;
 };
 
 export type ServiceDetails = {
@@ -377,7 +378,9 @@ export type ServiceFormValues = {
   image: string;
 };
 
-export type ServiceFormErrors = Partial<Record<keyof ServiceFormValues, string>>;
+export type ServiceFormErrors = Partial<
+  Record<keyof ServiceFormValues, string>
+>;
 
 export type ServiceFormProps = {
   /** Existing listing to edit; omit when creating a new service. */
@@ -406,7 +409,7 @@ export type DashboardStoreValue = {
   setServiceAvailability: (serviceId: string, isAvailable: boolean) => void;
   setServiceApprovalStatus: (
     serviceId: string,
-    status: ServiceApprovalStatus
+    status: ServiceApprovalStatus,
   ) => void;
   setUserRole: (userId: string, role: UserRole) => void;
 };
@@ -468,8 +471,6 @@ export type DashboardTopbarProps = {
   viewer: DashboardViewer;
 };
 
-
-
 export interface IServiceData {
   title: string;
   category:
@@ -492,3 +493,25 @@ export interface IServiceData {
   isAvailable: boolean;
   createdAt: Date;
 }
+
+
+
+
+export type BookingPayload = {
+  customerEmail: string;
+  customerName: string;
+  technicianEmail: string;
+  technicianName: string;
+  status: BookingStatus;
+  paymentStatus: PaymentStatus;
+  serviceId: string;
+  serviceTitle: string;
+  serviceImage: string;
+  category: string;
+  basePrice: number;
+  finalAmount: number;
+  problemDescription: string;
+  preferredDate: string;
+  customerPhone: string;
+  address: string;
+};

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,10 +23,7 @@ import {
 } from "@/components/profile/profile-utils";
 import { authClient } from "@/lib/auth-client";
 import { uploadToImgBB } from "@/lib/imgbb";
-import {
-  MAX_SERVICE_IMAGE_BYTES,
-  SERVICE_IMAGE_TYPES,
-} from "@/lib/validation";
+import { MAX_SERVICE_IMAGE_BYTES, SERVICE_IMAGE_TYPES } from "@/lib/validation";
 import type { DashboardViewer } from "@/types/type";
 
 type UpdateProfileDialogProps = {
@@ -157,6 +149,8 @@ export function UpdateProfileDialog({ viewer }: UpdateProfileDialogProps) {
         { ...values, name },
         image || undefined,
       );
+
+    
       const result = await authClient.updateUser(payload);
 
       if (result.error) {

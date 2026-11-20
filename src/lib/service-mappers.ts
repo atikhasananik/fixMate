@@ -35,6 +35,7 @@ export function toServiceDetails(item: ServiceApiItem): ServiceDetails {
     service,
     technician: {
       name: item.technicianName ?? "",
+      email:item.technicianEmail??"",
       image: item.technicianImage,
       bio: item.technicianBio,
       serviceArea: service.serviceArea,

@@ -55,7 +55,8 @@ export default async function ServiceDetailsPage({
     notFound();
   }
 
-  const { service, technician } = toServiceDetails(item);
+  const services = toServiceDetails(item);
+  const { service, technician } = services
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
@@ -68,7 +69,7 @@ export default async function ServiceDetailsPage({
         </div>
 
         <aside className="lg:sticky lg:top-6">
-          <ServiceBookingCard service={service} />
+          <ServiceBookingCard service={services} />
         </aside>
       </div>
     </section>
