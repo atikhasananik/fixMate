@@ -62,7 +62,7 @@ export default async function ServiceDetailsPage({
     <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       <ServiceDetailsHeader service={service} />
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(18rem,3fr)] lg:items-start">
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,6fr)_minmax(0,4fr)] lg:items-start">
         <div className="space-y-8">
           <ServiceInformation service={service} />
           <TechnicianCard technician={technician} />

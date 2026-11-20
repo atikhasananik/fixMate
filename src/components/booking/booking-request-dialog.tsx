@@ -194,7 +194,7 @@ export function BookingRequestDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[min(92dvh,52rem)] w-[calc(100%-2rem)] max-w-6xl overflow-y-auto p-0">
+      <DialogContent className=" w-[calc(100%-2rem)]  overflow-y-auto p-0 lg:max-w-4xl overflow-x-hidden">
         <form onSubmit={handleSubmit} noValidate>
           <DialogHeader className="border-b border-border/60 px-5 py-5 sm:px-6">
             <DialogTitle className="flex items-center gap-2 text-xl">
