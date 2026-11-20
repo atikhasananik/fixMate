@@ -35,14 +35,12 @@ import { toast } from "@/components/ui/toast";
 import { createBookingRequest } from "@/lib/Action/api/post.booking.api";
 import {
   getTodayDateInputValue,
-  isValidBookingRequest,
   validateBookingRequest,
   type BookingRequestErrors,
   type BookingRequestValues,
 } from "@/lib/booking-validation";
 import { BookingPayload, ServiceDetails } from "@/types/type";
 import { useSession } from "@/lib/auth-client";
-import { TechnicianCard } from "../services/technician-card";
 
 type BookingRequestDialogProps = {
   service: ServiceDetails;
@@ -57,6 +55,8 @@ const EMPTY_VALUES: BookingRequestValues = {
   problemDescription: "",
 };
 
+const BOOKING_REQUEST_TOAST_ID = "booking-request-submission";
+
 export function BookingRequestDialog({
   service,
   open,
@@ -68,6 +68,7 @@ export function BookingRequestDialog({
   }));
   const [errors, setErrors] = useState<BookingRequestErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState("");
   const today = getTodayDateInputValue();
 
   const { data: session } = useSession();
@@ -84,6 +85,7 @@ export function BookingRequestDialog({
         ...EMPTY_VALUES,
       });
       setErrors({});
+      setSubmissionError("");
     }
 
     onOpenChange(nextOpen);
@@ -114,6 +116,7 @@ export function BookingRequestDialog({
       return;
     }
 
+    setSubmissionError("");
     const nextErrors = validateBookingRequest(values, today);
     setErrors(nextErrors);
 
@@ -149,19 +152,38 @@ export function BookingRequestDialog({
       preferredDate: values.preferredDate,
       customerPhone: values.phone,
       address: values.address,
-    } as BookingPayload
+    } as BookingPayload;
 
-    console.log(payload);
-
+    toast.add({
+      id: BOOKING_REQUEST_TOAST_ID,
+      type: "loading",
+      title: "Submitting your repair request",
+      description: "Please wait while we send your request.",
+      timeout: 0,
+    });
     try {
-      await createBookingRequest(payload);
+      const result = await createBookingRequest(payload);
+
+      if (!result.success) {
+        const message =
+          result.result?.message ??
+          "Please check your details and try again.";
+        setSubmissionError(message);
+        toast.update(BOOKING_REQUEST_TOAST_ID, {
+          type: "error",
+          title: "Couldn't submit your request",
+          description: message,
+          timeout: 8000,
+        });
+        return;
+      }
 
       setValues({
         ...EMPTY_VALUES,
       });
       setErrors({});
       onOpenChange(false);
-      toast.add({
+      toast.update(BOOKING_REQUEST_TOAST_ID, {
         type: "success",
         title: "Repair request submitted",
         description: (
@@ -179,13 +201,16 @@ export function BookingRequestDialog({
       });
       router.refresh();
     } catch (error) {
-      toast.add({
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Please try again in a moment.";
+      setSubmissionError(message);
+      toast.update(BOOKING_REQUEST_TOAST_ID, {
         type: "error",
         title: "Couldn't submit your request",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Please try again in a moment.",
+        description: message,
+        timeout: 8000,
       });
     } finally {
       setIsSubmitting(false);
@@ -379,6 +404,15 @@ export function BookingRequestDialog({
               </FieldGroup>
             </section>
           </div>
+
+          {submissionError ? (
+            <p
+              role="alert"
+              className="mx-5 mb-4 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive sm:mx-6"
+            >
+              {submissionError}
+            </p>
+          ) : null}
 
           <DialogFooter className="px-5 sm:px-6">
             <Button

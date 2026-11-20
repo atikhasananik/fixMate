@@ -11,29 +11,23 @@ type CreateBookingResponse = {
   result?: unknown;
 };
 
-export async function createBookingRequest(
-  payload:BookingPayload
-): Promise<void> {
+export async function createBookingRequest(payload: BookingPayload) {
+  // console.log(payload);
+
   if (!BASE_URL) {
     throw new Error("The service API is not configured.");
   }
 
   const response = await fetch(`${BASE_URL}/add-booking`, {
     method: "POST",
-    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | CreateBookingResponse
-    | null;
+  const data = await response.json();
+  
+  return data
 
-  if (!response.ok) {
-    throw new Error(
-      data?.message ?? `Couldn't submit your repair request (${response.status}).`,
-    );
-  }
 }
