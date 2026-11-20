@@ -348,8 +348,8 @@ export type ServiceFormValues = {
 export type ServiceFormErrors = Partial<Record<keyof ServiceFormValues, string>>;
 
 export type ServiceFormProps = {
-  mode: "create" | "edit";
-  initialValues?: Partial<ServiceFormValues>;
+  /** Existing listing to edit; omit when creating a new service. */
+  service?: TechnicianService | null;
   technician: {
     name: string;
     email: string;

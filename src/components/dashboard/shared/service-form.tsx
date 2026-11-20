@@ -36,6 +36,7 @@ import type {
   ServiceFormProps,
   ServiceFormValues,
   ServiceMode,
+  TechnicianService,
 } from "@/types/type";
 
 const EMPTY_VALUES: ServiceFormValues = {
@@ -49,16 +50,28 @@ const EMPTY_VALUES: ServiceFormValues = {
   image: "",
 };
 
+function toFormValues(service: TechnicianService): ServiceFormValues {
+  return {
+    title: service.title,
+    category: service.category,
+    description: service.description,
+    basePrice: service.basePrice ? String(service.basePrice) : "",
+    estimatedDuration: service.estimatedDuration,
+    serviceMode: service.serviceMode,
+    serviceArea: service.serviceArea,
+    image: service.image ?? "",
+  };
+}
+
 export function ServiceForm({
-  mode,
-  initialValues,
+  service,
   technician,
   onSubmit,
 }: ServiceFormProps) {
-  const [values, setValues] = useState<ServiceFormValues>({
-    ...EMPTY_VALUES,
-    ...initialValues,
-  });
+  const isEditing = service != null;
+  const [values, setValues] = useState<ServiceFormValues>(() =>
+    service ? toFormValues(service) : { ...EMPTY_VALUES }
+  );
   const [errors, setErrors] = useState<ServiceFormErrors>({});
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   /** Ignores responses from uploads the user replaced mid-flight. */
@@ -168,7 +181,7 @@ export function ServiceForm({
     }
 
     const nextErrors = validateServiceForm(values, {
-      requireImage: mode === "create",
+      requireImage: !isEditing,
     });
     setErrors(nextErrors);
 
@@ -179,7 +192,6 @@ export function ServiceForm({
       return;
     }
 
-    console.log(values);
     onSubmit(values);
   }
 
@@ -422,15 +434,15 @@ export function ServiceForm({
                 <Loader2 className="animate-spin" aria-hidden="true" />
                 Uploading image…
               </>
-            ) : mode === "create" ? (
-              "Submit for approval"
-            ) : (
+            ) : isEditing ? (
               "Save changes"
+            ) : (
+              "Submit for approval"
             )}
           </Button>
         </div>
 
-        {mode === "edit" ? (
+        {isEditing ? (
           <p className="text-xs text-muted-foreground">
             Saving an edit sends the service back to admin approval.
           </p>

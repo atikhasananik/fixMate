@@ -47,6 +47,8 @@ import type {
   TechnicianServicesProps,
 } from "@/types/type";
 import { deleteService } from "@/lib/Action/api/delete.data.api";
+import { updateServiceData } from "@/lib/Action/api/update.data.api";
+import { buildServiceFields } from "@/lib/service-payload";
 
 export function TechnicianServices({
   services: initialServices,
@@ -65,33 +67,24 @@ export function TechnicianServices({
     setServices(initialServices);
   }
 
-  function handleUpdate(values: ServiceFormValues) {
+  async function handleUpdate(values: ServiceFormValues) {
     if (!editing) {
       return;
     }
 
-    setServices((previous) =>
-      previous.map((service) =>
-        service.id === editing.id
-          ? {
-              ...service,
-              title: values.title.trim(),
-              category: values.category,
-              description: values.description.trim(),
-              basePrice: Number(values.basePrice),
-              estimatedDuration: values.estimatedDuration.trim(),
-              serviceMode: values.serviceMode,
-              serviceArea: values.serviceArea.trim(),
-              image: values.image || undefined,
-              // Any edit needs to be reviewed again.
-              approvalStatus: "pending",
-            }
-          : service,
-      ),
-    );
-
-
-    
+    try {
+      await updateServiceData(editing.id, buildServiceFields(values));
+    } catch (error) {
+      toast.add({
+        type: "error",
+        title: "Couldn't update the service",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again in a moment.",
+      });
+      return;
+    }
 
     toast.add({
       type: "success",
@@ -99,6 +92,7 @@ export function TechnicianServices({
       description: "Your changes were saved and sent back for approval.",
     });
     setEditing(null);
+    router.refresh();
   }
 
   async function handleDelete() {
@@ -109,7 +103,6 @@ export function TechnicianServices({
     if (deleteServiceByID) {
       router.refresh();
     }
-    console.log(deleteServiceByID);
 
     toast.add({
       type: "success",
@@ -284,18 +277,9 @@ export function TechnicianServices({
 
           {editing ? (
             <ServiceForm
-              mode="edit"
+              key={editing.id}
+              service={editing}
               technician={{ name: viewer.name, email: viewer.email }}
-              initialValues={{
-                title: editing.title,
-                category: editing.category,
-                description: editing.description,
-                basePrice: String(editing.basePrice),
-                estimatedDuration: editing.estimatedDuration,
-                serviceMode: editing.serviceMode,
-                serviceArea: editing.serviceArea,
-                image: editing.image ?? "",
-              }}
               onSubmit={handleUpdate}
             />
           ) : null}

@@ -54,7 +54,6 @@ export function AddService() {
       <Card className="mx-auto w-full max-w-3xl rounded-2xl border border-border/70 ring-0 shadow-sm [--card-spacing:1.5rem]">
         <CardContent>
           <ServiceForm
-            mode="create"
             technician={{ name: viewer.name, email: viewer.email }}
             onSubmit={handleSubmit}
           />

@@ -22,15 +22,14 @@ export const SERVICE_MODE_VALUE_BY_LABEL: Record<
   "Shop Drop-off": "shop-drop-off",
 };
 
-/**
- * Turns raw form state into the exact body the add-service POST will send.
- * Technician identity comes from the session, and the three status fields are
- * fixed defaults, so the submit handler stays a one-liner.
- */
-export function buildServiceData(
-  values: ServiceFormValues,
-  technician: { name: string; email: string }
-): IServiceData {
+/** Editable listing fields shared by the create and update payloads. */
+export type ServiceFields = Omit<
+  IServiceData,
+  "technicianName" | "technicianEmail" | "isAvailable" | "createdAt"
+>;
+
+/** Maps form state to the fields an edit is allowed to change. */
+export function buildServiceFields(values: ServiceFormValues): ServiceFields {
   return {
     title: values.title.trim(),
     // validateServiceForm already checked it against SERVICE_CATEGORIES.
@@ -41,9 +40,23 @@ export function buildServiceData(
     estimatedDuration: values.estimatedDuration.trim(),
     serviceMode: SERVICE_MODE_LABEL_BY_VALUE[values.serviceMode],
     serviceArea: values.serviceArea.trim(),
+    approvalStatus: "pending",
+  };
+}
+
+/**
+ * Turns raw form state into the exact body the add-service POST will send.
+ * Technician identity comes from the session, and the three status fields are
+ * fixed defaults, so the submit handler stays a one-liner.
+ */
+export function buildServiceData(
+  values: ServiceFormValues,
+  technician: { name: string; email: string }
+): IServiceData {
+  return {
+    ...buildServiceFields(values),
     technicianName: technician.name,
     technicianEmail: technician.email,
-    approvalStatus: "pending",
     isAvailable: true,
     createdAt: new Date(),
   };
