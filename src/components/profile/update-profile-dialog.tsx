@@ -199,7 +199,7 @@ export function UpdateProfileDialog({ viewer }: UpdateProfileDialogProps) {
         Update Profile
       </DialogTrigger>
 
-      <DialogContent className="max-h-[min(90dvh,48rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto p-0 lg:max-w-6xl xl:max-w-7xl">
+      <DialogContent className="max-h-[min(90dvh,48rem)] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto p-0 lg:max-w-6xl xl:max-w-7xl overflow-x-hidden">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="border-b border-border/60 px-5 py-5 sm:px-6">
             <DialogTitle className="text-xl">Update your profile</DialogTitle>

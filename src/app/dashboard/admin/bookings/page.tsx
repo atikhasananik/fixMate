@@ -5,6 +5,6 @@ export const metadata: Metadata = {
   title: "All Bookings",
 };
 
-export default function AdminBookingsPage() {
+export default async function AdminBookingsPage() {
   return <AdminBookings />;
 }

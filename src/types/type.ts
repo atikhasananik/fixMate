@@ -240,6 +240,21 @@ export type Booking = {
   paymentStatus: PaymentStatus;
 };
 
+export type CustomerBooking = Pick<
+  Booking,
+  | "id"
+  | "serviceTitle"
+  | "technicianName"
+  | "preferredDate"
+  | "basePrice"
+  | "finalAmount"
+  | "status"
+  | "paymentStatus"
+> & {
+  category?: string;
+  serviceImage?: string;
+};
+
 export type ServiceListing = {
   id: string;
   title: string;

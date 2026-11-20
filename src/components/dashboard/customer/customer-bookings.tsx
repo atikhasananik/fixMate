@@ -1,18 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ClipboardList } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ClipboardList, TriangleAlert } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -28,31 +18,27 @@ import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { ServiceThumbnail } from "@/components/dashboard/shared/service-thumbnail";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { TableCard } from "@/components/dashboard/shared/table-card";
-import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { Booking } from "@/types/type";
+import type { CustomerBooking } from "@/types/type";
+import CustomerBookingsAction from "./customer-bookings-action";
 
-export function CustomerBookings() {
-  const { bookings, cancelBooking } = useDashboardStore();
-  const [cancelId, setCancelId] = useState<string | null>(null);
+type CustomerBookingsProps = {
+  bookings: CustomerBooking[];
+  error?: string | null;
+};
 
-  const pendingCancel = bookings.find((booking) => booking.id === cancelId);
+export function CustomerBookings({ bookings, error }: CustomerBookingsProps) {
+  async function handleStatusBtn(booking: CustomerBooking) {
+    // const setCancelStatus = await setStatus
 
-  function handleCancel() {
-    if (!pendingCancel) {
-      return;
-    }
-
-    cancelBooking(pendingCancel.id);
     toast.add({
-      type: "success",
-      title: "Booking cancelled",
-      description: `${pendingCancel.serviceTitle} has been cancelled.`,
+      type: "info",
+      title: "Cancellation isn't connected yet",
+      description: `Your request for ${booking.serviceTitle} was not changed.`,
     });
-    setCancelId(null);
   }
 
-  function handlePay(booking: Booking) {
+  function handlePay(booking: CustomerBooking) {
     // Stripe Checkout is not connected yet. Keep the entry point visible so
     // the flow can be wired without changing this table.
     toast.add({
@@ -81,9 +67,17 @@ export function CustomerBookings() {
 
       <TableCard
         title="All bookings"
-        description="Cancel a request while it is still waiting for a technician."
+        description="Your repair requests and their latest status."
       >
-        {bookings.length === 0 ? (
+        {error ? (
+          <div className="p-6">
+            <Alert variant="destructive">
+              <TriangleAlert aria-hidden="true" />
+              <AlertTitle>Couldn&apos;t load your bookings</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          </div>
+        ) : bookings.length === 0 ? (
           <EmptyState
             icon={ClipboardList}
             title="No bookings yet"
@@ -109,20 +103,29 @@ export function CustomerBookings() {
 
             <TableBody>
               {bookings.map((booking) => {
-                const canCancel = booking.status === "requested";
-                const canPay =
-                  booking.status === "completed" &&
-                  booking.paymentStatus === "unpaid";
-                const amount = booking.finalAmount ?? booking.basePrice;
+                const amount =
+                  (booking.finalAmount || 0) > booking.basePrice
+                    ? booking.finalAmount
+                    : booking.basePrice;
 
                 return (
                   <TableRow key={booking.id}>
                     <TableCell>
                       <div className="flex min-w-0 items-center gap-3">
-                        <ServiceThumbnail title={booking.serviceTitle} />
-                        <span className="truncate font-medium text-foreground">
-                          {booking.serviceTitle}
-                        </span>
+                        <ServiceThumbnail
+                          title={booking.serviceTitle}
+                          image={booking.serviceImage}
+                        />
+                        <div className="min-w-0">
+                          <span className="block truncate font-medium text-foreground">
+                            {booking.serviceTitle}
+                          </span>
+                          {booking.category ? (
+                            <span className="block truncate text-xs text-muted-foreground">
+                              {booking.category}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
@@ -132,7 +135,7 @@ export function CustomerBookings() {
                       {formatDate(booking.preferredDate)}
                     </TableCell>
                     <TableCell className="whitespace-nowrap font-medium tabular-nums">
-                      {formatCurrency(amount)}
+                      {formatCurrency(amount?? 0)}
                     </TableCell>
                     <TableCell>
                       <StatusBadge kind="booking" status={booking.status} />
@@ -143,35 +146,11 @@ export function CustomerBookings() {
                         status={booking.paymentStatus}
                       />
                     </TableCell>
-                    <TableCell>
-                      <div className="flex justify-end gap-2">
-                        {canCancel ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setCancelId(booking.id)}
-                          >
-                            Cancel
-                          </Button>
-                        ) : null}
-
-                        {canPay ? (
-                          <Button
-                            size="sm"
-                            onClick={() => handlePay(booking)}
-                            className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:text-slate-950 dark:hover:bg-blue-400"
-                          >
-                            Pay now
-                          </Button>
-                        ) : null}
-
-                        {!canCancel && !canPay ? (
-                          <span className="text-xs text-muted-foreground">
-                            —
-                          </span>
-                        ) : null}
-                      </div>
-                    </TableCell>
+                    <CustomerBookingsAction
+                      currentStatus={booking.status}
+                      id={booking.id}
+                      serviceTitle={booking.serviceTitle}
+                    />
                   </TableRow>
                 );
               })}
@@ -179,32 +158,6 @@ export function CustomerBookings() {
           </Table>
         )}
       </TableCard>
-
-      <AlertDialog
-        open={pendingCancel !== undefined}
-        onOpenChange={(open) => {
-          if (!open) {
-            setCancelId(null);
-          }
-        }}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {pendingCancel
-                ? `${pendingCancel.serviceTitle} will be cancelled and the technician will no longer see the request.`
-                : "This request will be cancelled."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Keep booking</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={handleCancel}>
-              Cancel booking
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

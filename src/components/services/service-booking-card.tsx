@@ -31,7 +31,6 @@ export async function ServiceBookingCard({
   const modeLabel =
     services.serviceMode === "home-visit" ? "Home visit" : "Shop drop-off";
 
-    console.log(service);
   return (
     
     <Card className="gap-0 rounded-2xl border border-border/70 shadow-sm">
