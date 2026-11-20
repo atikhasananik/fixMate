@@ -44,7 +44,7 @@ import {
   type BookingRequestErrors,
 } from "@/lib/booking-validation";
 import type {
-  BookingRequestPayload,
+  BookingData,
   BookingRequestValues,
   ServiceDetails,
 } from "@/types/type";
@@ -192,12 +192,23 @@ export function BookingRequestDialog({
 
     setIsSubmitting(true);
 
-    const payload: BookingRequestPayload = {
+    const payload: BookingData = {
       serviceId: service.service.id,
+      serviceTitle: service.service.title,
+      serviceImage: service.service.image ?? "",
+      category: service.service.category,
+      basePrice: service.service.basePrice,
+      technicianName: service.technician.name,
+      technicianEmail: service.technician.email,
+      customerName: customerName.trim(),
+      customerEmail: customerEmail.trim(),
       phone: values.phone.trim(),
       address: values.address.trim(),
       preferredDate: values.preferredDate,
       problemDescription: values.problemDescription.trim(),
+      status: "requested",
+      paymentStatus: "unpaid",
+      createdAt: new Date(),
     };
 
     toast.add({

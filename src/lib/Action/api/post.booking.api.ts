@@ -1,11 +1,8 @@
 import { BASE_URL } from "@/lib/Action/api/post.data.api";
-import type {
-  BookingRequestPayload,
-  CreateBookingResponse,
-} from "@/types/type";
+import type { BookingData, CreateBookingResponse } from "@/types/type";
 
 export async function createBookingRequest(
-  payload: BookingRequestPayload,
+  payload: BookingData,
 ): Promise<CreateBookingResponse> {
   if (!BASE_URL) {
     throw new Error("The service API is not configured.");

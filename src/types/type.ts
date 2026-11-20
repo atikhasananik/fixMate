@@ -591,7 +591,7 @@ export interface IServiceData {
 
 
 
-export type BookingData = {
+export interface BookingData {
   serviceId: string;
   serviceTitle: string;
   serviceImage: string;
@@ -608,20 +608,11 @@ export type BookingData = {
   status: "requested";
   paymentStatus: "unpaid";
   createdAt: Date;
-};
+}
 
-/** Untrusted client input; the API must derive user and service data itself. */
-export type BookingRequestPayload = {
-  serviceId: string;
-  phone: string;
-  address: string;
-  preferredDate: string;
-  problemDescription: string;
-};
-
-export type BookingRequestValues = Omit<
-  BookingRequestPayload,
-  "serviceId"
+export type BookingRequestValues = Pick<
+  BookingData,
+  "phone" | "address" | "preferredDate" | "problemDescription"
 >;
 
 export type BookingRequestErrors = Partial<
