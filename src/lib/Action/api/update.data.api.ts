@@ -3,6 +3,7 @@ import type { ServiceFields } from "@/lib/service-payload";
 import type {
   BookingStatus,
   UpdateBookingStatusResponse,
+  UpdateServiceAvailabilityResponse,
 } from "@/types/type";
 
 export const updateServiceData = async (
@@ -22,6 +23,37 @@ export const updateServiceData = async (
   }
 
   return res.json();
+};
+
+export const updateServiceAvailability = async (
+  id: string,
+  isAvailable: boolean,
+): Promise<UpdateServiceAvailabilityResponse> => {
+  const res = await fetch(`${BASE_URL}/update-service-isavailable/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ isAvailable }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Couldn't update availability (${res.status}).`);
+  }
+
+  const data = (await res.json()) as UpdateServiceAvailabilityResponse;
+
+  if (data.success === false) {
+    throw new Error(
+      data.result?.message ?? data.message ?? "Couldn't update availability.",
+    );
+  }
+
+  if (data.result?.matchedCount === 0) {
+    throw new Error("That service could not be found.");
+  }
+
+  return data;
 };
 
 export const updateBookingStatus = async (

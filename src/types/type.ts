@@ -331,6 +331,16 @@ export type UpdateBookingStatusResponse = {
   };
 };
 
+export type UpdateServiceAvailabilityResponse = {
+  success?: boolean;
+  message?: string;
+  result?: {
+    matchedCount?: number;
+    modifiedCount?: number;
+    message?: string;
+  };
+};
+
 export type ServiceListing = {
   id: string;
   title: string;

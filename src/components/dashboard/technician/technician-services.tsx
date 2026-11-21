@@ -22,6 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import {
   Table,
@@ -47,7 +48,10 @@ import type {
   TechnicianServicesProps,
 } from "@/types/type";
 import { deleteService } from "@/lib/Action/api/delete.data.api";
-import { updateServiceData } from "@/lib/Action/api/update.data.api";
+import {
+  updateServiceAvailability,
+  updateServiceData,
+} from "@/lib/Action/api/update.data.api";
 import { buildServiceFields } from "@/lib/service-payload";
 
 export function TechnicianServices({
@@ -60,6 +64,9 @@ export function TechnicianServices({
   const [serverServices, setServerServices] = useState(initialServices);
   const [editing, setEditing] = useState<TechnicianService | null>(null);
   const [deleting, setDeleting] = useState<TechnicianService | null>(null);
+  const [updatingAvailabilityId, setUpdatingAvailabilityId] = useState<
+    string | null
+  >(null);
 
   // Pick up fresh server data after `router.refresh()` retries a failed load.
   if (initialServices !== serverServices) {
@@ -112,22 +119,46 @@ export function TechnicianServices({
     setDeleting(null);
   }
 
-  function handleAvailability(
+  async function handleAvailability(
     service: TechnicianService,
     isAvailable: boolean,
   ) {
-    setServices((previous) =>
-      previous.map((item) =>
-        item.id === service.id ? { ...item, isAvailable } : item,
-      ),
-    );
-    toast.add({
-      type: "success",
-      title: isAvailable ? "Service is available" : "Service hidden",
-      description: isAvailable
-        ? `${service.title} can be booked again.`
-        : `${service.title} no longer appears on public pages.`,
-    });
+    // One availability update at a time; ignore clicks while it is running.
+    if (updatingAvailabilityId) {
+      return;
+    }
+
+    setUpdatingAvailabilityId(service.id);
+
+    try {
+      await updateServiceAvailability(service.id, isAvailable);
+
+      // The backend confirmed, so reflect the new value in the table.
+      setServices((previous) =>
+        previous.map((item) =>
+          item.id === service.id ? { ...item, isAvailable } : item,
+        ),
+      );
+
+      toast.add({
+        type: "success",
+        title: isAvailable ? "Service is available" : "Service hidden",
+        description: isAvailable
+          ? `${service.title} can be booked again.`
+          : `${service.title} no longer appears on public pages.`,
+      });
+    } catch (error) {
+      toast.add({
+        type: "error",
+        title: "Couldn't update availability",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again in a moment.",
+      });
+    } finally {
+      setUpdatingAvailabilityId(null);
+    }
   }
 
   return (
@@ -224,13 +255,19 @@ export function TechnicianServices({
                     />
                   </TableCell>
                   <TableCell>
-                    <Switch
-                      checked={service.isAvailable}
-                      onCheckedChange={(checked) =>
-                        handleAvailability(service, checked)
-                      }
-                      aria-label={`Toggle availability for ${service.title}`}
-                    />
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={service.isAvailable}
+                        disabled={Boolean(updatingAvailabilityId)}
+                        onCheckedChange={(checked) =>
+                          handleAvailability(service, checked)
+                        }
+                        aria-label={`Toggle availability for ${service.title}`}
+                      />
+                      {updatingAvailabilityId === service.id ? (
+                        <Spinner className="size-3.5" />
+                      ) : null}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex justify-end gap-2">
