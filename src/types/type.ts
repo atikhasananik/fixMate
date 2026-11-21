@@ -295,14 +295,21 @@ export type GetTechnicianBookingRequestsResponse = {
   bookings?: TechnicianBookingApiDocument[];
 };
 
-export type Categories = 'Smartphone' | 'Laptop & PC' | 'AC' | 'Refrigerator' | 'TV' | 'Washing Machine' | 'Electrical'
+export type Categories =
+  | "Smartphone"
+  | "Laptop & PC"
+  | "AC"
+  | "Refrigerator"
+  | "TV"
+  | "Washing Machine"
+  | "Electrical";
 
 export type BookingApiDocument = {
   _id?: string;
   id?: string;
   serviceTitle?: string;
   serviceImage?: string;
-  category?: Categories
+  category?: Categories;
   technicianName?: string;
   preferredDate?: string;
   basePrice?: number | string;
@@ -418,7 +425,6 @@ export type ServiceCardProps = {
 };
 
 export type ServicesToolbarProps = {
-  categories: string[];
   /** Raw route search params, used to read and preserve query values. */
   searchParams: Record<string, string | string[] | undefined>;
 };
@@ -569,7 +575,7 @@ export type DashboardTopbarProps = {
 
 export interface IServiceData {
   title: string;
-  category:Categories
+  category: Categories;
   description: string;
   image: string;
   basePrice: number;
@@ -582,9 +588,6 @@ export interface IServiceData {
   isAvailable: boolean;
   createdAt: Date;
 }
-
-
-
 
 export interface BookingData {
   serviceId: string;

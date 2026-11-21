@@ -30,9 +30,13 @@ export async function getServiceData(
   return Array.isArray(data.result) ? data.result : [];
 }
 
-// Every service listing, used by the public services page.
-export async function getAllServiceData(): Promise<ServiceApiItem[]> {
-  const res = await fetch(`${BASE_URL}/get-all-services`, {
+// Every service listing, used by the public services page. The backend does
+// the searching, filtering and sorting; pass the URL query string through.
+export async function getAllServiceData(
+  queryString = "",
+): Promise<ServiceApiItem[]> {
+  const suffix = queryString ? `?${queryString}` : "";
+  const res = await fetch(`${BASE_URL}/get-all-services${suffix}`, {
     cache: "no-store",
   });
 

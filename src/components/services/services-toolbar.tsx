@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { RotateCcw, Search, X } from "lucide-react";
 import { cn } from "cn";
@@ -20,12 +20,11 @@ import {
 } from "@/components/ui/select";
 import {
   buildServicesSearchParams,
+  hasActiveServiceFilters,
   readServiceParam,
-  SERVICE_PARAMS,
   type ServiceParamPatch,
-  type ServiceQueryKey,
 } from "@/lib/services-query";
-import type { ServicesToolbarProps } from "@/types/type";
+import type { Categories, ServicesToolbarProps } from "@/types/type";
 
 type FilterOption = { value: string; label: string };
 
@@ -93,13 +92,30 @@ function FilterSelect({
   );
 }
 
-export function ServicesToolbar({
-  categories,
-  searchParams,
-}: ServicesToolbarProps) {
+const categories: Categories[] = [
+  "Smartphone",
+  "Laptop & PC",
+  "AC",
+  "Refrigerator",
+  "TV",
+  "Washing Machine",
+  "Electrical",
+];
+
+const SEARCH_DEBOUNCE_MS = 300;
+
+export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [search, setSearch] = useState("");
+  const urlSearch = readServiceParam(searchParams, "search");
+  const [search, setSearch] = useState(urlSearch);
+  const [lastPushedSearch, setLastPushedSearch] = useState(urlSearch);
+
+  // Adopt URL changes that didn't come from this input (back/forward, clear).
+  if (urlSearch !== lastPushedSearch) {
+    setLastPushedSearch(urlSearch);
+    setSearch(urlSearch);
+  }
 
   const category = readServiceParam(searchParams, "category");
   const mode = readServiceParam(searchParams, "mode");
@@ -111,22 +127,38 @@ export function ServicesToolbar({
     ...categories.map((item) => ({ value: item, label: item })),
   ];
 
-  const hasActiveParams = (
-    Object.keys(SERVICE_PARAMS) as ServiceQueryKey[]
-  ).some((key) => Boolean(readServiceParam(searchParams, key)));
+  const hasActiveParams = hasActiveServiceFilters(searchParams);
 
   /** Only job of this component: write params to the URL. */
-  function setQueryParams(patch: ServiceParamPatch) {
-    const searchString = buildServicesSearchParams(searchParams, patch);
+  const setQueryParams = useCallback(
+    (patch: ServiceParamPatch) => {
+      const searchString = buildServicesSearchParams(searchParams, patch);
 
-    router.replace(searchString ? `${pathname}?${searchString}` : pathname, {
-      scroll: false,
-    });
-  }
+      router.replace(searchString ? `${pathname}?${searchString}` : pathname, {
+        scroll: false,
+      });
+    },
+    [pathname, router, searchParams]
+  );
+
+  // Debounce search typing so each keystroke doesn't trigger a request.
+  useEffect(() => {
+    const next = search.trim();
+
+    if (next === urlSearch) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setLastPushedSearch(next);
+      setQueryParams({ search: next || null });
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [search, urlSearch, setQueryParams]);
 
   function handleSearchChange(value: string) {
     setSearch(value);
-    setQueryParams({ search: value || null });
   }
 
   function handleCategoryChange(value: string) {

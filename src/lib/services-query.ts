@@ -62,3 +62,27 @@ export function buildServicesSearchParams(
 
   return params.toString();
 }
+
+/** Only the service params, as a query string for the backend request. */
+export function buildServiceApiQuery(
+  raw: Record<string, string | string[] | undefined>
+): string {
+  const params = new URLSearchParams();
+
+  for (const key of SERVICE_QUERY_KEYS) {
+    const value = readServiceParam(raw, key);
+
+    if (value) {
+      params.set(SERVICE_PARAMS[key], value);
+    }
+  }
+
+  return params.toString();
+}
+
+/** True when the URL carries any search, filter or sort value. */
+export function hasActiveServiceFilters(
+  raw: Record<string, string | string[] | undefined>
+): boolean {
+  return SERVICE_QUERY_KEYS.some((key) => Boolean(readServiceParam(raw, key)));
+}
