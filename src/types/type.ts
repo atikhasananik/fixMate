@@ -295,6 +295,43 @@ export type GetTechnicianBookingRequestsResponse = {
   bookings?: TechnicianBookingApiDocument[];
 };
 
+/** Raw document returned by `GET /get-bookings-by-admin`. */
+export type AdminBookingApiDocument = {
+  _id?: string;
+  id?: string;
+  serviceTitle?: string;
+  serviceImage?: string;
+  customerName?: string;
+  technicianName?: string;
+  preferredDate?: string;
+  basePrice?: number | string;
+  finalAmount?: number | string;
+  status?: BookingStatus;
+  paymentStatus?: PaymentStatus;
+  createdAt?: string;
+};
+
+export type GetAdminBookingsResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: AdminBookingApiDocument[];
+};
+
+/** Normalised booking shape used by the admin bookings table and cards. */
+export type AdminBooking = {
+  id: string;
+  serviceTitle: string;
+  serviceImage?: string;
+  customerName: string;
+  technicianName: string;
+  preferredDate: string;
+  basePrice: number;
+  finalAmount?: number;
+  status: BookingStatus;
+  paymentStatus: PaymentStatus;
+};
+
 export type Categories =
   | "Smartphone"
   | "Laptop & PC"
@@ -439,6 +476,13 @@ export type TechnicianServicesProps = {
 
 export type AdminServicesProps = {
   services: TechnicianService[];
+  error?: string | null;
+  /** Raw route search params, used to read and preserve query values. */
+  searchParams: Record<string, string | string[] | undefined>;
+};
+
+export type AdminBookingsProps = {
+  bookings: AdminBooking[];
   error?: string | null;
   /** Raw route search params, used to read and preserve query values. */
   searchParams: Record<string, string | string[] | undefined>;

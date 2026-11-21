@@ -1,8 +1,11 @@
 import { BASE_URL } from "./post.data.api";
 import type {
+  AdminBooking,
+  AdminBookingApiDocument,
   BookingApiDocument,
   BookingStatus,
   CustomerBooking,
+  GetAdminBookingsResponse,
   GetBookingsResponse,
   GetServicesResponse,
   GetSingleServiceResponse,
@@ -301,4 +304,62 @@ export async function getAllUsers(): Promise<PlatformUser[]> {
   }
 
   return data.result.map(toPlatformUser);
+}
+
+function toAdminBooking(item: AdminBookingApiDocument): AdminBooking {
+  const id = item._id ?? item.id;
+
+  if (!id) {
+    throw new Error("The bookings response contains an invalid booking.");
+  }
+
+  const basePrice = Number(item.basePrice);
+  const finalAmount =
+    item.finalAmount == null ? undefined : Number(item.finalAmount);
+
+  return {
+    id,
+    serviceTitle: item.serviceTitle || "Repair service",
+    serviceImage: item.serviceImage || undefined,
+    customerName: item.customerName || "Unknown customer",
+    technicianName: item.technicianName || "Not assigned",
+    preferredDate: item.preferredDate || "",
+    basePrice: Number.isFinite(basePrice) ? basePrice : 0,
+    ...(finalAmount !== undefined && Number.isFinite(finalAmount)
+      ? { finalAmount }
+      : {}),
+    status:
+      item.status && isBookingStatus(item.status) ? item.status : "requested",
+    paymentStatus:
+      item.paymentStatus === "paid" || item.paymentStatus === "unpaid"
+        ? item.paymentStatus
+        : "unpaid",
+  };
+}
+
+/** Fetches every booking for the admin All Bookings page. */
+export async function getAdminBookingData(
+  queryString = "",
+): Promise<AdminBooking[]> {
+  if (!BASE_URL) {
+    throw new Error("The service API is not configured.");
+  }
+
+  const suffix = queryString ? `?${queryString}` : "";
+  const res = await fetch(`${BASE_URL}/get-bookings-by-admin${suffix}`, {
+    cache: "no-store",
+  });
+  const data = (await res.json().catch(() => null)) as
+    | GetAdminBookingsResponse
+    | null;
+
+  if (!res.ok) {
+    throw new Error(data?.message ?? `Couldn't load bookings (${res.status}).`);
+  }
+
+  if (!Array.isArray(data?.result)) {
+    throw new Error("The bookings API returned an unexpected response.");
+  }
+
+  return data.result.map(toAdminBooking);
 }

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { CalendarDays } from "lucide-react";
+import { useTransition } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { CalendarDays, TriangleAlert } from "lucide-react";
 import { cn } from "cn";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -10,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
@@ -23,40 +26,70 @@ import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { ServiceThumbnail } from "@/components/dashboard/shared/service-thumbnail";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { TableCard } from "@/components/dashboard/shared/table-card";
-import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
+import {
+  buildAdminBookingsSearchParams,
+  readAdminBookingParam,
+} from "@/lib/admin-bookings-query";
 import { BOOKING_STATUS_OPTIONS } from "@/lib/dashboard-data";
 import { formatCurrency, formatDate } from "@/lib/format";
-import type { Booking, BookingStatus } from "@/types/type";
+import type {
+  AdminBooking,
+  AdminBookingsProps,
+  BookingStatus,
+} from "@/types/type";
 
 type BookingFilter = BookingStatus | "all";
 
 type BookingServiceCellProps = {
   title: string;
+  image?: string;
   className?: string;
 };
 
 /** Thumbnail + title, shared by the desktop table and the mobile cards. */
-function BookingServiceCell({ title, className }: BookingServiceCellProps) {
+function BookingServiceCell({
+  title,
+  image,
+  className,
+}: BookingServiceCellProps) {
   return (
     <div className={cn("flex min-w-0 items-center gap-3", className)}>
-      <ServiceThumbnail title={title} />
+      <ServiceThumbnail title={title} image={image} />
       <span className="truncate font-medium text-foreground">{title}</span>
     </div>
   );
 }
 
-function getBookingAmount(booking: Booking) {
+function getBookingAmount(booking: AdminBooking) {
   return booking.finalAmount ?? booking.basePrice;
 }
 
-export function AdminBookings() {
-  const { bookings } = useDashboardStore();
-  const [filter, setFilter] = useState<BookingFilter>("all");
+export function AdminBookings({
+  bookings,
+  error,
+  searchParams,
+}: AdminBookingsProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
 
-  const visibleBookings =
-    filter === "all"
-      ? bookings
-      : bookings.filter((booking) => booking.status === filter);
+  // The URL is the source of truth for the filter; the backend does the work.
+  const statusParam = readAdminBookingParam(searchParams, "status");
+  const filter: BookingFilter = BOOKING_STATUS_OPTIONS.some(
+    (option) => option.value === statusParam,
+  )
+    ? (statusParam as BookingStatus)
+    : "all";
+
+  function handleFilterChange(value: string) {
+    const searchString = buildAdminBookingsSearchParams(searchParams, {
+      status: value === "all" ? null : value,
+    });
+    const href = searchString ? `${pathname}?${searchString}` : pathname;
+
+    // push (not replace) so back/forward steps through filter states.
+    startTransition(() => router.push(href, { scroll: false }));
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -72,9 +105,8 @@ export function AdminBookings() {
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <Select
               value={filter}
-              onValueChange={(value) =>
-                setFilter((value ?? "all") as BookingFilter)
-              }
+              onValueChange={(value) => handleFilterChange(value ?? "all")}
+              disabled={isPending}
             >
               <SelectTrigger
                 className="w-full sm:w-40"
@@ -97,14 +129,38 @@ export function AdminBookings() {
                 ))}
               </SelectContent>
             </Select>
+            {isPending ? <Spinner className="size-3.5" /> : null}
           </div>
         }
       >
-        {visibleBookings.length === 0 ? (
+        {error ? (
+          <EmptyState
+            icon={TriangleAlert}
+            title="Couldn't load bookings"
+            description={error}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => startTransition(() => router.refresh())}
+              className="mt-2"
+            >
+              Try again
+            </Button>
+          </EmptyState>
+        ) : bookings.length === 0 ? (
           <EmptyState
             icon={CalendarDays}
-            title="No bookings match this filter"
-            description="Choose another status to see more repair requests."
+            title={
+              filter === "all"
+                ? "No bookings yet"
+                : "No bookings match this filter"
+            }
+            description={
+              filter === "all"
+                ? "New customer bookings will appear here."
+                : "Choose another status to see more repair requests."
+            }
           />
         ) : (
           <>
@@ -113,7 +169,7 @@ export function AdminBookings() {
               aria-label="Platform bookings"
               className="divide-y divide-border/60 xl:hidden"
             >
-              {visibleBookings.map((booking) => (
+              {bookings.map((booking) => (
                 <li
                   key={booking.id}
                   className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/30 sm:p-5"
@@ -121,6 +177,7 @@ export function AdminBookings() {
                   <div className="flex items-start justify-between gap-3">
                     <BookingServiceCell
                       title={booking.serviceTitle}
+                      image={booking.serviceImage}
                       className="flex-1"
                     />
                     <div className="flex shrink-0 flex-col items-end gap-1">
@@ -184,10 +241,13 @@ export function AdminBookings() {
                 </TableHeader>
 
                 <TableBody>
-                  {visibleBookings.map((booking) => (
+                  {bookings.map((booking) => (
                     <TableRow key={booking.id}>
                       <TableCell>
-                        <BookingServiceCell title={booking.serviceTitle} />
+                        <BookingServiceCell
+                          title={booking.serviceTitle}
+                          image={booking.serviceImage}
+                        />
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
                         {booking.customerName}
