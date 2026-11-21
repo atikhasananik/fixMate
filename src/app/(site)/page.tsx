@@ -29,43 +29,43 @@ import type {
 
 const categories: ServiceCategory[] = [
   {
-    slug: "smartphone",
+    slug: "Smartphone",
     name: "Smartphone",
     description: "Screen, battery, charging port, and water-damage repairs.",
     icon: Smartphone,
   },
   {
-    slug: "laptop-pc",
+    slug: "Laptop & PC",
     name: "Laptop & PC",
     description: "Hardware upgrades, keyboard fixes, and diagnostics.",
     icon: Laptop,
   },
   {
-    slug: "ac",
+    slug: "AC",
     name: "AC",
     description: "Gas refills, servicing, installation, and cooling repairs.",
     icon: AirVent,
   },
   {
-    slug: "refrigerator",
+    slug: "Refrigerator",
     name: "Refrigerator",
     description: "Cooling issues, compressor repairs, and thermostat fixes.",
     icon: Refrigerator,
   },
   {
-    slug: "tv",
+    slug: "TV",
     name: "TV",
     description: "Panel, backlight, sound, and setup support.",
     icon: Tv,
   },
   {
-    slug: "washing-machine",
+    slug: "Washing Machine",
     name: "Washing Machine",
     description: "Drum, motor, drainage, and control board repairs.",
     icon: WashingMachine,
   },
   {
-    slug: "electrical",
+    slug: "Electrical",
     name: "Electrical",
     description: "Wiring, switches, breakers, lighting, and safety checks.",
     icon: Plug,
