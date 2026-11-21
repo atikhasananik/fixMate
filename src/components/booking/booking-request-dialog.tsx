@@ -196,7 +196,7 @@ export function BookingRequestDialog({
       serviceId: service.service.id,
       serviceTitle: service.service.title,
       serviceImage: service.service.image ?? "",
-      category: service.service.category,
+      category: service.service.category || undefined,
       basePrice: service.service.basePrice,
       technicianName: service.technician.name,
       technicianEmail: service.technician.email,

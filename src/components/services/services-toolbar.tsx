@@ -2,13 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { RotateCcw, Search, X } from "lucide-react";
+import { RotateCcw, Search} from "lucide-react";
 import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
 import {
@@ -32,12 +31,6 @@ const MODE_OPTIONS: FilterOption[] = [
   { value: "all", label: "All modes" },
   { value: "home-visit", label: "Home visit" },
   { value: "shop-drop-off", label: "Shop drop-off" },
-];
-
-const AVAILABILITY_OPTIONS: FilterOption[] = [
-  { value: "all", label: "All availability" },
-  { value: "available", label: "Available now" },
-  { value: "unavailable", label: "Unavailable" },
 ];
 
 const SORT_OPTIONS: FilterOption[] = [
@@ -109,17 +102,26 @@ export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
   const pathname = usePathname();
   const urlSearch = readServiceParam(searchParams, "search");
   const [search, setSearch] = useState(urlSearch);
-  const [lastPushedSearch, setLastPushedSearch] = useState(urlSearch);
+  // The previous URL value, used to tell a real URL change (back/forward,
+  // Clear all) apart from props that are still stale while our own debounced
+  // navigation is in flight.
+  const [previousUrlSearch, setPreviousUrlSearch] = useState(urlSearch);
+  // The value this input last wrote to the URL, so its echo can be ignored.
+  const [pushedSearch, setPushedSearch] = useState(urlSearch);
 
-  // Adopt URL changes that didn't come from this input (back/forward, clear).
-  if (urlSearch !== lastPushedSearch) {
-    setLastPushedSearch(urlSearch);
-    setSearch(urlSearch);
+  if (urlSearch !== previousUrlSearch) {
+    setPreviousUrlSearch(urlSearch);
+
+    // Don't overwrite the box with the echo of what was just pushed — the
+    // user may have typed more while the navigation was loading.
+    if (urlSearch !== pushedSearch) {
+      setPushedSearch(urlSearch);
+      setSearch(urlSearch);
+    }
   }
 
   const category = readServiceParam(searchParams, "category");
   const mode = readServiceParam(searchParams, "mode");
-  const availability = readServiceParam(searchParams, "availability");
   const sort = readServiceParam(searchParams, "sort");
 
   const categoryOptions: FilterOption[] = [
@@ -138,10 +140,11 @@ export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
         scroll: false,
       });
     },
-    [pathname, router, searchParams]
+    [pathname, router, searchParams],
   );
 
-  // Debounce search typing so each keystroke doesn't trigger a request.
+  // Debounce search typing so each keystroke doesn't trigger a request; the
+  // API is only called once the user pauses.
   useEffect(() => {
     const next = search.trim();
 
@@ -150,7 +153,7 @@ export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
     }
 
     const timer = setTimeout(() => {
-      setLastPushedSearch(next);
+      setPushedSearch(next);
       setQueryParams({ search: next || null });
     }, SEARCH_DEBOUNCE_MS);
 
@@ -169,9 +172,7 @@ export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
     setQueryParams({ mode: value === "all" ? null : value });
   }
 
-  function handleAvailabilityChange(value: string) {
-    setQueryParams({ availability: value === "all" ? null : value });
-  }
+
 
   function handleSortChange(value: string) {
     setQueryParams({ sort: value === "newest" ? null : value });
@@ -206,17 +207,6 @@ export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
             aria-label="Search services"
             autoComplete="off"
           />
-          {search ? (
-            <InputGroupAddon align="inline-end">
-              <InputGroupButton
-                size="icon-xs"
-                aria-label="Clear search"
-                onClick={() => handleSearchChange("")}
-              >
-                <X aria-hidden="true" />
-              </InputGroupButton>
-            </InputGroupAddon>
-          ) : null}
         </InputGroup>
 
         <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
@@ -235,13 +225,7 @@ export function ServicesToolbar({ searchParams }: ServicesToolbarProps) {
               active={Boolean(mode)}
               onChange={handleModeChange}
             />
-            <FilterSelect
-              label="Filter by availability"
-              value={availability}
-              options={AVAILABILITY_OPTIONS}
-              active={Boolean(availability)}
-              onChange={handleAvailabilityChange}
-            />
+
             <FilterSelect
               label="Sort services"
               value={sort}

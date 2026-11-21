@@ -399,7 +399,8 @@ export type ServiceDetails = {
 export type TechnicianService = {
   id: string;
   title: string;
-  category: Categories;
+  /** Empty string when the API document has no category. */
+  category: Categories | "";
   description: string;
   image?: string;
   basePrice: number;
@@ -471,7 +472,8 @@ export type DashboardNavConfig = Record<UserRole, DashboardNavItem[]>;
 
 export type ServiceFormValues = {
   title: string;
-  category: Categories;
+  /** Empty until the user picks a category; validation rejects it. */
+  category: Categories | "";
   description: string;
   basePrice: string;
   estimatedDuration: string;
@@ -546,7 +548,8 @@ export type ServiceThumbnailProps = {
 
 export type ServiceCellProps = {
   title: string;
-  category: Categories;
+  /** Display-only label; may fall back to "Uncategorized". */
+  category: string;
   image?: string;
 };
 
@@ -593,7 +596,8 @@ export interface BookingData {
   serviceId: string;
   serviceTitle: string;
   serviceImage: string;
-  category: Categories;
+  /** Omitted when the service listing has no category. */
+  category?: Categories;
   basePrice: number;
   technicianName: string;
   technicianEmail: string;

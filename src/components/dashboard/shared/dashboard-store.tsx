@@ -91,7 +91,8 @@ export function DashboardStoreProvider({
           ? {
               ...service,
               title: values.title.trim(),
-              category: values.category,
+              // Validation requires a category; keep the old one if it is blank.
+              category: values.category || service.category,
               description: values.description.trim(),
               basePrice: Number(values.basePrice),
               estimatedDuration: values.estimatedDuration.trim(),
