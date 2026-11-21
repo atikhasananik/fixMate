@@ -251,7 +251,7 @@ export type CustomerBooking = Pick<
   | "status"
   | "paymentStatus"
 > & {
-  category?: string;
+  category?: Categories;
   serviceImage?: string;
 };
 
@@ -295,12 +295,14 @@ export type GetTechnicianBookingRequestsResponse = {
   bookings?: TechnicianBookingApiDocument[];
 };
 
+export type Categories = 'Smartphone' | 'Laptop & PC' | 'AC' | 'Refrigerator' | 'TV' | 'Washing Machine' | 'Electrical'
+
 export type BookingApiDocument = {
   _id?: string;
   id?: string;
   serviceTitle?: string;
   serviceImage?: string;
-  category?: string;
+  category?: Categories
   technicianName?: string;
   preferredDate?: string;
   basePrice?: number | string;
@@ -325,7 +327,7 @@ export type UpdateBookingStatusResponse = {
 export type ServiceListing = {
   id: string;
   title: string;
-  category: string;
+  category: Categories;
   description: string;
   basePrice: number;
   estimatedDuration: string;
@@ -344,7 +346,7 @@ export type ServiceListing = {
 export type ServiceApiItem = {
   _id: string;
   title?: string;
-  category?: string;
+  category?: Categories;
   description?: string;
   image?: string;
   basePrice?: number;
@@ -390,7 +392,7 @@ export type ServiceDetails = {
 export type TechnicianService = {
   id: string;
   title: string;
-  category: string;
+  category: Categories;
   description: string;
   image?: string;
   basePrice: number;
@@ -463,7 +465,7 @@ export type DashboardNavConfig = Record<UserRole, DashboardNavItem[]>;
 
 export type ServiceFormValues = {
   title: string;
-  category: string;
+  category: Categories;
   description: string;
   basePrice: string;
   estimatedDuration: string;
@@ -538,7 +540,7 @@ export type ServiceThumbnailProps = {
 
 export type ServiceCellProps = {
   title: string;
-  category: string;
+  category: Categories;
   image?: string;
 };
 
@@ -567,14 +569,7 @@ export type DashboardTopbarProps = {
 
 export interface IServiceData {
   title: string;
-  category:
-    | "Smartphone"
-    | "Laptop & PC"
-    | "AC"
-    | "Refrigerator"
-    | "TV"
-    | "Washing Machine"
-    | "Electrical";
+  category:Categories
   description: string;
   image: string;
   basePrice: number;
@@ -595,7 +590,7 @@ export interface BookingData {
   serviceId: string;
   serviceTitle: string;
   serviceImage: string;
-  category: string;
+  category: Categories;
   basePrice: number;
   technicianName: string;
   technicianEmail: string;
