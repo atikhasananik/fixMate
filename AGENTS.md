@@ -43,6 +43,19 @@ Role-based on-demand repair platform. This repo is the Next.js 16 App Router fro
 - The input's local state is the source of truth. URL prop changes are adopted only when they are **not** the echo of the value just pushed (`previousUrlSearch` / `pushedSearch`). Do not reintroduce a `urlSearch !== lastPushedSearch` render-time reset — it compares a just-pushed value against the still-stale URL and wipes characters on every debounce.
 - Keep the toolbar mounted across query navigations: `src/app/(site)/services/page.tsx` renders `<ServicesToolbar>` **outside** an in-page `<Suspense>` and there is intentionally **no** `src/app/(site)/services/loading.tsx`. A route-level `loading.tsx` replaces the whole page segment immediately on navigation, which unmounts the input, drops focus, and clears typed text. The results (count + grid) suspend behind the in-page boundary instead.
 
+## Booking listing API (technician Manage Requests)
+
+`GET http://localhost:5000/get-booking-req/:email` — bookings assigned to a technician. **Filtering happens on the backend.** `src/app/dashboard/technician/requests/page.tsx` forwards the URL query string via `buildBookingsApiQuery()` (`src/lib/bookings-query.ts`) and renders the response as-is. `booking-management.tsx` must not `.filter()` the list.
+
+| Param | Values | Server behaviour |
+|---|---|---|
+| `status` | `requested`, `accepted`, `in-progress`, `completed` | Exact match on `status`. Unknown values are ignored, so the listing falls back to all statuses. Keep this whitelist in sync with `FILTER_OPTIONS` in `booking-management.tsx`. |
+
+- The status `Select` writes the URL with `router.push` (so back/forward steps through filter states) and removes the param for "All bookings". The filter is derived from `searchParams`, never from local state.
+- URL helpers are shared: `src/lib/query-params.ts` is the generic core; `services-query.ts` and `bookings-query.ts` are thin wrappers. Add a filter by adding one entry to `BOOKING_PARAMS`.
+- Do not re-add `src/app/dashboard/technician/requests/loading.tsx`: a route-level loading boundary unmounts the filter `Select` on every filter navigation (focus lost + skeleton flash). Next keeps the current list visible until the filtered response arrives.
+- Customer bookings (`/get-bookings/:email`) has no filters yet; admin bookings reads the mock `useDashboardStore`, not the API.
+
 ## Next.js 16 specifics
 
 - Installed Next.js is newer than most training data. Read `node_modules/next/dist/docs/01-app/01-getting-started/` (and the relevant API reference) before using unfamiliar APIs.

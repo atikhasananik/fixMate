@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
   AlertCircle,
   CalendarDays,
@@ -36,7 +37,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
-import { updateBookingStatus, updateBookingStatusByTechnician } from "@/lib/Action/api/update.data.api";
+import { updateBookingStatusByTechnician } from "@/lib/Action/api/update.data.api";
+import {
+  buildBookingsSearchParams,
+  hasActiveBookingFilters,
+  readBookingParam,
+} from "@/lib/bookings-query";
 import { formatCurrency, formatDate } from "@/lib/format";
 import type { BookingStatus, TechnicianBooking } from "@/types/type";
 
@@ -50,6 +56,8 @@ type BookingFilter =
 type BookingManagementProps = {
   bookings: TechnicianBooking[];
   error?: string | null;
+  /** Raw route search params, used to read and preserve query values. */
+  searchParams: Record<string, string | string[] | undefined>;
 };
 
 const FILTER_OPTIONS: { value: BookingFilter; label: string }[] = [
@@ -117,17 +125,44 @@ function BookingDetails({ booking }: { booking: TechnicianBooking }) {
 export function BookingManagement({
   bookings: initialBookings,
   error,
+  searchParams,
 }: BookingManagementProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [bookings, setBookings] = useState(initialBookings);
-  const [filter, setFilter] = useState<BookingFilter>("all");
+  // Adopt fresh server data when the URL (and backend query) changes, while
+  // keeping optimistic status updates between renders.
+  const [syncedBookings, setSyncedBookings] = useState(initialBookings);
   const [updatingBookingId, setUpdatingBookingId] = useState<string | null>(
     null,
   );
 
-  const visibleBookings =
-    filter === "all"
-      ? bookings
-      : bookings.filter((booking) => booking.status === filter);
+  if (initialBookings !== syncedBookings) {
+    setSyncedBookings(initialBookings);
+    setBookings(initialBookings);
+  }
+
+  // The URL is the source of truth for the filter, so back/forward and the
+  // backend request stay in sync without local filter state.
+  const statusParam = readBookingParam(searchParams, "status");
+  const filter: BookingFilter = FILTER_OPTIONS.some(
+    (option) => option.value === statusParam,
+  )
+    ? (statusParam as BookingFilter)
+    : "all";
+
+  const hasActiveFilter = hasActiveBookingFilters(searchParams);
+
+  function handleFilterChange(value: string) {
+    const searchString = buildBookingsSearchParams(searchParams, {
+      status: value === "all" ? null : value,
+    });
+
+    // push (not replace) so back/forward steps through filter states.
+    router.push(searchString ? `${pathname}?${searchString}` : pathname, {
+      scroll: false,
+    });
+  }
 
   async function handleStatusChange(
     booking: TechnicianBooking,
@@ -194,9 +229,7 @@ export function BookingManagement({
           action={
             <Select
               value={filter}
-              onValueChange={(value) =>
-                setFilter((value ?? "all") as BookingFilter)
-              }
+              onValueChange={(value) => handleFilterChange(value ?? "all")}
             >
               <SelectTrigger
                 className="w-full sm:w-44"
@@ -217,24 +250,24 @@ export function BookingManagement({
             </Select>
           }
         >
-          {visibleBookings.length === 0 ? (
+          {bookings.length === 0 ? (
             <EmptyState
               icon={ClipboardList}
               title={
-                bookings.length === 0
-                  ? "No repair requests yet"
-                  : "No bookings match this filter"
+                hasActiveFilter
+                  ? "No bookings match this filter"
+                  : "No repair requests yet"
               }
               description={
-                bookings.length === 0
-                  ? "New customer requests for your services will appear here."
-                  : "Choose another status to see more repair requests."
+                hasActiveFilter
+                  ? "Choose another status to see more repair requests."
+                  : "New customer requests for your services will appear here."
               }
             />
           ) : (
             <>
               <div className="space-y-3 p-4 xl:hidden">
-                {visibleBookings.map((booking) => (
+                {bookings.map((booking) => (
                   <Card key={booking.id} className="gap-0">
                     <CardHeader className="pb-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -296,7 +329,7 @@ export function BookingManagement({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {visibleBookings.map((booking) => (
+                    {bookings.map((booking) => (
                       <TableRow key={booking.id}>
                         <TableCell className="font-medium">
                           {booking.customerName}

@@ -197,13 +197,15 @@ function toTechnicianBooking(
 
 export async function getTechnicianBookingRequests(
   email: string,
+  queryString = "",
 ): Promise<TechnicianBooking[]> {
   if (!BASE_URL) {
     throw new Error("The service API is not configured.");
   }
 
+  const suffix = queryString ? `?${queryString}` : "";
   const res = await fetch(
-    `${BASE_URL}/get-booking-req/${encodeURIComponent(email)}`,
+    `${BASE_URL}/get-booking-req/${encodeURIComponent(email)}${suffix}`,
     { cache: "no-store" },
   );
   const data = (await res.json().catch(() => null)) as

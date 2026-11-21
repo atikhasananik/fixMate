@@ -228,5 +228,5 @@ export function BookingActions({
     );
   }
 
-  return <span className="text-sm text-muted-foreground">No action</span>;
+  return <span className="text-sm text-center text-muted-foreground">-</span>;
 }
