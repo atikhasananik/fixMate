@@ -440,6 +440,29 @@ export type ServicesToolbarProps = {
   searchParams: Record<string, string | string[] | undefined>;
 };
 
+/** Raw document returned by `GET /get-all-users` (BetterAuth `user` collection). */
+export type PlatformUserApiDocument = {
+  _id: string;
+  name?: string;
+  email?: string;
+  emailVerified?: boolean;
+  role?: string;
+  image?: string;
+  area?: string;
+  bio?: string;
+  phone?: string;
+  /** ISO date string. */
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type GetUsersResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: PlatformUserApiDocument[];
+};
+
 export type PlatformUser = {
   id: string;
   name: string;

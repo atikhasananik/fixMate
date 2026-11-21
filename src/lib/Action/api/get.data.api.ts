@@ -6,10 +6,14 @@ import type {
   GetBookingsResponse,
   GetServicesResponse,
   GetSingleServiceResponse,
+  GetUsersResponse,
+  PlatformUser,
+  PlatformUserApiDocument,
   ServiceApiItem,
   GetTechnicianBookingRequestsResponse,
   TechnicianBooking,
   TechnicianBookingApiDocument,
+  UserRole,
 } from "@/types/type";
 
 /** Fetches the services that belong to one technician from the Express API. */
@@ -238,4 +242,44 @@ export async function getTechnicianBookingRequests(
       (booking) =>
         booking.technicianEmail.trim().toLowerCase() === technicianEmail,
     );
+}
+
+function toPlatformUser(item: PlatformUserApiDocument): PlatformUser {
+  if (!item._id) {
+    throw new Error("The users response contains an invalid user.");
+  }
+
+  const role: UserRole =
+    item.role === "admin" || item.role === "technician"
+      ? item.role
+      : "customer";
+
+  return {
+    id: item._id,
+    name: item.name?.trim() || "Unnamed user",
+    email: item.email?.trim() || "No email",
+    image: item.image || undefined,
+    role,
+    joinedAt: item.createdAt ?? "",
+  };
+}
+
+/** Fetches every registered account for the admin Manage Users page. */
+export async function getAllUsers(): Promise<PlatformUser[]> {
+  if (!BASE_URL) {
+    throw new Error("The service API is not configured.");
+  }
+
+  const res = await fetch(`${BASE_URL}/get-all-users`, { cache: "no-store" });
+  const data = (await res.json().catch(() => null)) as GetUsersResponse | null;
+
+  if (!res.ok) {
+    throw new Error(data?.message ?? `Couldn't load users (${res.status}).`);
+  }
+
+  if (!Array.isArray(data?.result)) {
+    throw new Error("The users API returned an unexpected response.");
+  }
+
+  return data.result.map(toPlatformUser);
 }

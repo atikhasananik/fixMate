@@ -1,8 +1,10 @@
 "use client";
 
-import { Users } from "lucide-react";
+import { TriangleAlert, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -18,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "@/components/ui/toast";
 import { EmptyState } from "@/components/dashboard/shared/empty-state";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { TableCard } from "@/components/dashboard/shared/table-card";
@@ -29,34 +30,42 @@ import type { PlatformUser, UserRole } from "@/types/type";
 
 const ROLE_OPTIONS: UserRole[] = ["customer", "technician", "admin"];
 
-export function AdminUsers() {
-  const { viewer, users, setUserRole } = useDashboardStore();
+type AdminUsersProps = {
+  users: PlatformUser[];
+  error?: string | null;
+};
 
-  function handleRoleChange(user: PlatformUser, role: UserRole) {
-    if (user.id === viewer.id) {
-      return;
-    }
-
-    setUserRole(user.id, role);
-    toast.add({
-      type: "success",
-      title: "Role updated",
-      description: `${user.name} is now a ${ROLE_LABELS[role].toLowerCase()}.`,
-    });
-  }
+export function AdminUsers({ users, error }: AdminUsersProps) {
+  const { viewer } = useDashboardStore();
+  const router = useRouter();
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Manage Users"
-        description="Review everyone on the platform and adjust roles when needed."
+        description="Review everyone registered on the platform."
       />
 
       <TableCard
         title="All users"
-        description="You cannot change your own role from this table."
+        description="Roles are assigned by the platform."
       >
-        {users.length === 0 ? (
+        {error ? (
+          <EmptyState
+            icon={TriangleAlert}
+            title="Couldn't load users"
+            description={error}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.refresh()}
+              className="mt-2"
+            >
+              Try again
+            </Button>
+          </EmptyState>
+        ) : users.length === 0 ? (
           <EmptyState
             icon={Users}
             title="No users found"
@@ -106,15 +115,7 @@ export function AdminUsers() {
                       {user.email}
                     </TableCell>
                     <TableCell>
-                      <Select
-                        value={user.role}
-                        onValueChange={(value) => {
-                          if (value) {
-                            handleRoleChange(user, value as UserRole);
-                          }
-                        }}
-                        disabled={isSelf}
-                      >
+                      <Select value={user.role} disabled>
                         <SelectTrigger
                           size="sm"
                           className="w-36"
