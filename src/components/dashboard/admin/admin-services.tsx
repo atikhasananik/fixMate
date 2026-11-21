@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ShieldCheck, TriangleAlert } from "lucide-react";
+import { cn } from "cn";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -40,6 +41,45 @@ import type {
 } from "@/types/type";
 
 type ApprovalFilter = ServiceApprovalStatus | "all";
+
+type ApprovalActionsProps = {
+  service: TechnicianService;
+  isUpdating: boolean;
+  onDecision: (service: TechnicianService, status: ServiceApprovalStatus) => void;
+  className?: string;
+};
+
+/** Shared Approve/Reject controls for both the table and the mobile cards. */
+function ApprovalActions({
+  service,
+  isUpdating,
+  onDecision,
+  className,
+}: ApprovalActionsProps) {
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      {isUpdating ? <Spinner className="size-3.5" /> : null}
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={isUpdating || service.approvalStatus === "approved"}
+        onClick={() => onDecision(service, "approved")}
+        className="flex-1 border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 lg:flex-none dark:border-emerald-900/70 dark:text-emerald-300 dark:hover:bg-emerald-950/60"
+      >
+        Approve
+      </Button>
+      <Button
+        variant="destructive"
+        size="sm"
+        disabled={isUpdating || service.approvalStatus === "rejected"}
+        onClick={() => onDecision(service, "rejected")}
+        className="flex-1 lg:flex-none"
+      >
+        Reject
+      </Button>
+    </div>
+  );
+}
 
 export function AdminServices({
   services,
@@ -122,14 +162,14 @@ export function AdminServices({
         title="All services"
         description="Pending listings are shown first so nothing waits too long."
         action={
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <Select
               value={filter}
               onValueChange={(value) => handleFilterChange(value ?? "all")}
               disabled={isPending}
             >
               <SelectTrigger
-                className="w-40"
+                className="w-full sm:w-40"
                 aria-label="Filter by approval status"
               >
                 <SelectValue>
@@ -179,77 +219,118 @@ export function AdminServices({
             }
           />
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Technician
-                </TableHead>
-                <TableHead className="hidden sm:table-cell">Price</TableHead>
-                <TableHead>Approval</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
+          <>
+            {/* Mobile & tablet: stacked cards to avoid horizontal scrolling. */}
+            <ul className="divide-y divide-border/60 lg:hidden">
               {services.map((service) => {
                 const isUpdating = updatingServiceId === service.id;
 
                 return (
-                  <TableRow key={service.id}>
-                    <TableCell>
-                      <ServiceCell
-                        title={service.title}
-                        category={service.category}
-                        image={service.image}
-                      />
-                    </TableCell>
-                    <TableCell className="hidden whitespace-nowrap md:table-cell">
-                      {service.technicianName}
-                    </TableCell>
-                    <TableCell className="hidden whitespace-nowrap font-medium tabular-nums sm:table-cell">
-                      {formatCurrency(service.basePrice)}
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge
-                        kind="approval"
-                        status={service.approvalStatus}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-2">
-                        {isUpdating ? (
-                          <Spinner className="size-3.5" />
-                        ) : null}
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          disabled={
-                            isUpdating || service.approvalStatus === "approved"
-                          }
-                          onClick={() => handleDecision(service, "approved")}
-                          className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 dark:border-emerald-900/70 dark:text-emerald-300 dark:hover:bg-emerald-950/60"
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          disabled={
-                            isUpdating || service.approvalStatus === "rejected"
-                          }
-                          onClick={() => handleDecision(service, "rejected")}
-                        >
-                          Reject
-                        </Button>
+                  <li
+                    key={service.id}
+                    className="flex flex-col gap-3 p-4 transition-colors hover:bg-muted/30 sm:p-5"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <ServiceCell
+                          title={service.title}
+                          category={service.category}
+                          image={service.image}
+                        />
                       </div>
-                    </TableCell>
-                  </TableRow>
+                      <div className="shrink-0 pt-0.5">
+                        <StatusBadge
+                          kind="approval"
+                          status={service.approvalStatus}
+                        />
+                      </div>
+                    </div>
+
+                    <dl className="grid grid-cols-2 gap-3 border-t border-border/60 pt-3 text-sm">
+                      <div className="min-w-0">
+                        <dt className="text-xs text-muted-foreground">
+                          Technician
+                        </dt>
+                        <dd className="truncate font-medium text-foreground">
+                          {service.technicianName || "Not assigned"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-muted-foreground">Price</dt>
+                        <dd className="font-medium tabular-nums text-foreground">
+                          {formatCurrency(service.basePrice)}
+                        </dd>
+                      </div>
+                    </dl>
+
+                    <ApprovalActions
+                      service={service}
+                      isUpdating={isUpdating}
+                      onDecision={handleDecision}
+                      className="mt-auto"
+                    />
+                  </li>
                 );
               })}
-            </TableBody>
-          </Table>
+            </ul>
+
+            {/* Desktop: the existing table, unchanged in structure. */}
+            <div className="hidden lg:block">
+              <Table className="[&_td]:py-3">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Service</TableHead>
+                    <TableHead className="hidden md:table-cell">
+                      Technician
+                    </TableHead>
+                    <TableHead className="hidden sm:table-cell">
+                      Price
+                    </TableHead>
+                    <TableHead>Approval</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {services.map((service) => {
+                    const isUpdating = updatingServiceId === service.id;
+
+                    return (
+                      <TableRow key={service.id}>
+                        <TableCell>
+                          <ServiceCell
+                            title={service.title}
+                            category={service.category}
+                            image={service.image}
+                          />
+                        </TableCell>
+                        <TableCell className="hidden whitespace-nowrap md:table-cell">
+                          {service.technicianName}
+                        </TableCell>
+                        <TableCell className="hidden whitespace-nowrap font-medium tabular-nums sm:table-cell">
+                          {formatCurrency(service.basePrice)}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge
+                            kind="approval"
+                            status={service.approvalStatus}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <ApprovalActions
+                            service={service}
+                            isUpdating={isUpdating}
+                            onDecision={handleDecision}
+                            className="justify-end"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </TableCard>
     </div>
