@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BookingRequestDialog } from "@/components/booking/booking-request-dialog";
 import { ServiceDetails } from "@/types/type";
+import { authClient } from "@/lib/auth-client";
 
 type BookingRequestActionProps = {
   service : ServiceDetails
@@ -12,6 +13,8 @@ type BookingRequestActionProps = {
 
 export function BookingRequestAction({ service } : BookingRequestActionProps) {
   const [open, setOpen] = useState(false);
+
+ 
 
   return (
     <>
