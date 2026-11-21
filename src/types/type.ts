@@ -341,6 +341,16 @@ export type UpdateServiceAvailabilityResponse = {
   };
 };
 
+export type UpdateServiceApprovalStatusResponse = {
+  success?: boolean;
+  message?: string;
+  result?: {
+    matchedCount?: number;
+    modifiedCount?: number;
+    message?: string;
+  };
+};
+
 export type ServiceListing = {
   id: string;
   title: string;
@@ -425,6 +435,13 @@ export type TechnicianService = {
 export type TechnicianServicesProps = {
   services: TechnicianService[];
   error?: string | null;
+};
+
+export type AdminServicesProps = {
+  services: TechnicianService[];
+  error?: string | null;
+  /** Raw route search params, used to read and preserve query values. */
+  searchParams: Record<string, string | string[] | undefined>;
 };
 
 /* -------------------------------------------------------------------------- */

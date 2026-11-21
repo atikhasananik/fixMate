@@ -53,6 +53,25 @@ export async function getAllServiceData(
   return Array.isArray(data.result) ? data.result : [];
 }
 
+// Admin service approval listing. The backend owns filtering and the
+// pending-first ordering; the URL query string is passed through untouched.
+export async function getAdminServiceData(
+  queryString = "",
+): Promise<ServiceApiItem[]> {
+  const suffix = queryString ? `?${queryString}` : "";
+  const res = await fetch(`${BASE_URL}/get-all-services-by-admin${suffix}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Couldn't load services (${res.status}).`);
+  }
+
+  const data = (await res.json()) as GetServicesResponse;
+
+  return Array.isArray(data.result) ? data.result : [];
+}
+
 // get single service data
 
 export const getSingleServiceData = async (
