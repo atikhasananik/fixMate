@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { TriangleAlert, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "cn";
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
   TableBody,
@@ -23,15 +24,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { toast } from "@/components/ui/toast";
 import { EmptyState } from "@/components/dashboard/shared/empty-state";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { TableCard } from "@/components/dashboard/shared/table-card";
 import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
+import { updateUserRoleAction } from "@/lib/Action/update-role.action";
 import { formatDate } from "@/lib/format";
 import { ROLE_LABELS, getInitials } from "@/lib/nav";
 import type { PlatformUser, UserRole } from "@/types/type";
 
 const ROLE_OPTIONS: UserRole[] = ["customer", "technician", "admin"];
+
+/** The backend refuses every role change for this account. */
+const PROTECTED_ADMIN_EMAIL = "admin@fixmate.com";
+
+function isProtectedAdmin(email: string) {
+  return email.trim().toLowerCase() === PROTECTED_ADMIN_EMAIL;
+}
 
 type AdminUsersProps = {
   users: PlatformUser[];
@@ -87,37 +97,119 @@ function UserIdentity({
 
 type UserRoleSelectProps = {
   user: PlatformUser;
-  className?: string;
+  onValueChange: (role: UserRole) => void;
+  /** The account is locked, so the control stays read-only. */
+  pending?: boolean;
+  disabled?: boolean;
+  fullWidth?: boolean;
 };
 
 /**
- * Read-only role control: the API has no role-update endpoint yet, so this is
- * intentionally disabled on both layouts.
+ * Role control shared by the table and the mobile cards. Updates are sent
+ * through the server action, so the select reflects saved state only.
  */
-function UserRoleSelect({ user, className }: UserRoleSelectProps) {
+function UserRoleSelect({
+  user,
+  onValueChange,
+  pending = false,
+  disabled = false,
+  fullWidth = false,
+}: UserRoleSelectProps) {
+  const isProtected = isProtectedAdmin(user.email);
+
   return (
-    <Select value={user.role} disabled>
-      <SelectTrigger
-        size="sm"
-        className={cn("w-36", className)}
-        aria-label={`Role for ${user.name}`}
+    <div className={cn("flex items-center gap-2", fullWidth && "w-full")}>
+      <Select
+        value={user.role}
+        onValueChange={(value) => {
+          if (value && value !== user.role) {
+            onValueChange(value as UserRole);
+          }
+        }}
+        disabled={disabled || pending || isProtected}
       >
-        <SelectValue>{ROLE_LABELS[user.role]}</SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {ROLE_OPTIONS.map((role) => (
-          <SelectItem key={role} value={role}>
-            {ROLE_LABELS[role]}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectTrigger
+          size="sm"
+          className={cn(fullWidth ? "w-full" : "w-36")}
+          aria-label={
+            isProtected
+              ? `Role for ${user.name} (protected account)`
+              : `Role for ${user.name}`
+          }
+        >
+          <SelectValue>{ROLE_LABELS[user.role]}</SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {ROLE_OPTIONS.map((role) => (
+            <SelectItem key={role} value={role}>
+              {ROLE_LABELS[role]}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {pending ? <Spinner className="size-3.5" /> : null}
+    </div>
   );
 }
 
-export function AdminUsers({ users, error }: AdminUsersProps) {
+export function AdminUsers({ users: initialUsers, error }: AdminUsersProps) {
   const { viewer } = useDashboardStore();
   const router = useRouter();
+  const [users, setUsers] = useState(initialUsers);
+  const [serverUsers, setServerUsers] = useState(initialUsers);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
+
+  // Pick up fresh server data after `router.refresh()` retries a failed load.
+  if (initialUsers !== serverUsers) {
+    setServerUsers(initialUsers);
+    setUsers(initialUsers);
+  }
+
+  async function handleRoleChange(user: PlatformUser, role: UserRole) {
+    // One role update at a time; ignore extra changes while it runs.
+    if (updatingUserId || role === user.role) {
+      return;
+    }
+
+    setUpdatingUserId(user.id);
+
+    try {
+      const result = await updateUserRoleAction(user.email, role);
+
+      if (!result.ok) {
+        toast.add({
+          type: "error",
+          title: "Couldn't update role",
+          description: result.error,
+        });
+        return;
+      }
+
+      // The backend confirmed the change, so reflect it in both layouts.
+      setUsers((previous) =>
+        previous.map((item) =>
+          item.id === user.id ? { ...item, role } : item,
+        ),
+      );
+
+      toast.add({
+        type: "success",
+        title: "Role updated",
+        description: `${user.name} is now ${ROLE_LABELS[role]}.`,
+      });
+    } catch (error) {
+      toast.add({
+        type: "error",
+        title: "Couldn't update role",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again in a moment.",
+      });
+    } finally {
+      setUpdatingUserId(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -161,6 +253,7 @@ export function AdminUsers({ users, error }: AdminUsersProps) {
               >
                 {users.map((user) => {
                   const isSelf = user.id === viewer.id;
+                  const isProtected = isProtectedAdmin(user.email);
 
                   return (
                     <li key={user.id}>
@@ -179,8 +272,18 @@ export function AdminUsers({ users, error }: AdminUsersProps) {
                             </span>
                             <UserRoleSelect
                               user={user}
-                              className="w-full"
+                              fullWidth
+                              onValueChange={(role) =>
+                                handleRoleChange(user, role)
+                              }
+                              disabled={updatingUserId !== null}
+                              pending={updatingUserId === user.id}
                             />
+                            {isProtected ? (
+                              <p className="text-xs text-muted-foreground">
+                                This account&apos;s role can&apos;t be changed.
+                              </p>
+                            ) : null}
                           </div>
 
                           <div className="flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-sm">
@@ -226,7 +329,14 @@ export function AdminUsers({ users, error }: AdminUsersProps) {
                           {user.email}
                         </TableCell>
                         <TableCell>
-                          <UserRoleSelect user={user} />
+                          <UserRoleSelect
+                            user={user}
+                            onValueChange={(role) =>
+                              handleRoleChange(user, role)
+                            }
+                            disabled={updatingUserId !== null}
+                            pending={updatingUserId === user.id}
+                          />
                         </TableCell>
                         <TableCell className="hidden whitespace-nowrap sm:table-cell">
                           {formatDate(user.joinedAt)}

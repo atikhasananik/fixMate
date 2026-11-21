@@ -388,6 +388,21 @@ export type UpdateServiceApprovalStatusResponse = {
   };
 };
 
+export type UpdateUserRoleResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: {
+    matchedCount?: number;
+    modifiedCount?: number;
+  };
+};
+
+/** Outcome returned by the `updateUserRoleAction` server action. */
+export type UpdateUserRoleResult =
+  | { ok: true }
+  | { ok: false; error: string };
+
 export type ServiceListing = {
   id: string;
   title: string;

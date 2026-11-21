@@ -6,6 +6,8 @@ import type {
   UpdateBookingStatusResponse,
   UpdateServiceApprovalStatusResponse,
   UpdateServiceAvailabilityResponse,
+  UpdateUserRoleResponse,
+  UserRole,
 } from "@/types/type";
 
 export const updateServiceData = async (
@@ -119,6 +121,38 @@ export const updateBookingStatus = async (
   }
 
   return data;
+};
+
+/**
+ * Changes a user's role through the admin-only backend route.
+ *
+ * Must only be called from the server (see `update-role.action.ts`): the admin
+ * key is a server-only env var, so it never reaches the browser.
+ */
+export const updateUserRole = async (
+  email: string,
+  role: UserRole,
+): Promise<UpdateUserRoleResponse> => {
+  const res = await fetch(`${BASE_URL}/update-role-by-admin`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      "x-admin-api-key": process.env.ADMIN_API_KEY ?? "",
+    },
+    body: JSON.stringify({ email, role }),
+  });
+
+  const data = (await res.json().catch(() => null)) as
+    | UpdateUserRoleResponse
+    | null;
+
+  if (!res.ok || data?.success === false) {
+    throw new Error(
+      data?.message ?? `Couldn't update the role (${res.status}).`,
+    );
+  }
+
+  return data ?? {};
 };
 
 export const updateBookingStatusByTechnician = async (
