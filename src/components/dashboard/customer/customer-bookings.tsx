@@ -150,6 +150,7 @@ export function CustomerBookings({ bookings, error }: CustomerBookingsProps) {
                       currentStatus={booking.status}
                       id={booking.id}
                       serviceTitle={booking.serviceTitle}
+                      paymentStatus = {booking.paymentStatus}
                     />
                   </TableRow>
                 );

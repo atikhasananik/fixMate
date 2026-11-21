@@ -16,18 +16,20 @@ import {
 import { TableCell } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
 import { updateBookingStatus } from "@/lib/Action/api/update.data.api";
-import type { BookingStatus } from "@/types/type";
+import type { BookingStatus, PaymentStatus } from "@/types/type";
 
 interface CustomerBookingsActionProps {
   currentStatus: BookingStatus;
   id: string;
   serviceTitle: string;
+  paymentStatus: PaymentStatus;
 }
 
 export default function CustomerBookingsAction({
   currentStatus,
   id,
   serviceTitle,
+  paymentStatus,
 }: CustomerBookingsActionProps) {
   const router = useRouter();
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -77,7 +79,16 @@ export default function CustomerBookingsAction({
   return (
     <TableCell>
       <div className="flex justify-end gap-2">
-        {canCancel ? (
+        {currentStatus === "completed" && paymentStatus === "unpaid" ? (
+          <Button
+            type="button"
+            
+            className={`bg-blue-600 text-white hover:bg-blue-700 `}
+            size="sm"
+          >
+            Pay Now
+          </Button>
+        ) : canCancel ? (
           <Button
             type="button"
             variant="outline"
