@@ -21,21 +21,21 @@ For a repair and service marketplace, **Royal Blue** paired with **Solid Slate N
 ### Light Mode (Clean & Classic)
 | Token Name | Hex Code | Tailwind Class | Usage |
 | :--- | :--- | :--- | :--- |
-| **Page Canvas** | `#F8FAFC` | `bg-slate-50` | Main page background |
+| **Page Canvas** | `#F4F8FC` | `bg-background` | Main page background |
 | **Card Surface** | `#FFFFFF` | `bg-white` | Service cards, dashboard widgets, modals |
-| **Subtle Border** | `#E2E8F0` | `border-slate-200` | Card outlines, table dividers, inputs |
-| **Text Primary** | `#0F172A` | `text-slate-900` | Main headings, titles, key numbers |
-| **Text Secondary** | `#475569` | `text-slate-600` | Body copy, descriptions |
-| **Text Muted** | `#64748B` | `text-slate-500` | Captions, timestamps, placeholders |
+| **Subtle Border** | `#DCE6F1` | `border-border` | Card outlines, table dividers, inputs |
+| **Text Primary** | `#172033` | `text-foreground` | Main headings, titles, key numbers |
+| **Text Secondary** | `#536176` | `text-muted-foreground` | Body copy, descriptions, captions |
+| **Text Muted** | `#536176` | `text-muted-foreground` | Timestamps, placeholders |
 
 ### Dark Mode (Modern Obsidian)
 | Token Name | Hex Code | Tailwind Class | Usage |
 | :--- | :--- | :--- | :--- |
-| **Page Canvas** | `#0B1120` | `bg-[#0B1120]` | Main dark page background |
-| **Card Surface** | `#111827` | `bg-gray-900` | Dark mode cards, sidebar, topbar |
-| **Subtle Border** | `#1F2937` | `border-gray-800` | Dark mode borders and dividers |
+| **Page Canvas** | `#0B1120` | `bg-background` | Main dark page background |
+| **Card Surface** | `#111827` | `bg-card` | Dark mode cards, sidebar, topbar |
+| **Subtle Border** | `rgba(255,255,255,0.10)` | `border-border` | Dark mode borders and dividers |
 | **Text Primary** | `#F8FAFC` | `text-slate-50` | Main headings in dark mode |
-| **Text Secondary** | `#94A3B8` | `text-slate-400` | Body descriptions in dark mode |
+| **Text Secondary** | `#A4B1C4` | `text-muted-foreground` | Body descriptions in dark mode |
 
 ---
 

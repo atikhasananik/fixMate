@@ -20,7 +20,7 @@ export function HeroSection({
     <section
       aria-labelledby="hero-heading"
       className={cn(
-        "relative overflow-hidden border-b border-border/60 bg-slate-50 dark:bg-[#0B1120]",
+        "relative overflow-hidden border-b border-border/60 bg-background",
         className
       )}
     >

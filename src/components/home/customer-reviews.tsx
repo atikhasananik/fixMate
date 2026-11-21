@@ -15,7 +15,7 @@ export function CustomerReviews({
     <section
       aria-labelledby="customer-reviews-heading"
       className={cn(
-        "border-t border-border/60 bg-slate-50 dark:bg-[#0B1120]",
+        "border-t border-border/60 bg-background",
         className
       )}
     >

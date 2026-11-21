@@ -12,10 +12,10 @@ FixMate’s visual identity merges **clean corporate minimalism** with **modern 
 The color system relies on a neutral slate foundation paired with semantic status indicators.
 
 ### A. Core Neutrals & Surfaces
-* **Background (Light):** `#F8FAFC` (Slate 50) / Pure White (`#FFFFFF`) for cards.
-* **Background (Dark / Obsidian Mode):** `#0F172A` (Slate 900) with cards in `#1E293B` (Slate 800).
-* **Text Primary:** `#0F172A` (Light mode) | `#F8FAFC` (Dark mode).
-* **Text Muted:** `#64748B` (Slate 500).
+* **Background (Light):** `#F4F8FC` (soft blue-tinted canvas) / Pure White (`#FFFFFF`) for cards.
+* **Background (Dark / Obsidian Mode):** `#0B1120` with cards in `#111827`.
+* **Text Primary:** `#172033` (Light mode) | `#F8FAFC` (Dark mode).
+* **Text Muted:** `#536176` (Light mode) | `#A4B1C4` (Dark mode).
 
 ### B. Brand Accent (Trust & Reliability)
 * **Primary Brand (Action / Buttons / Active States):** `#2563EB` (Royal Blue / Tailwind `blue-600`)

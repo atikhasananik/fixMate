@@ -19,7 +19,7 @@ FixMate is an App Router Next.js frontend for a role-based repair marketplace. T
 - Lint one file: `npx eslint src/app/path/page.tsx`
 - Typecheck: `npx tsc --noEmit`
 
-There is no test runner or configured test script. Do not invent `npm test` or claim a test suite passes. For focused validation, run the relevant ESLint command and `npx tsc --noEmit`; use `npm run build` for the main end-to-end check.
+There is no test runner or configured test script, so there is no single-test command. Do not invent `npm test` or claim a test suite passes. For a focused check, lint the changed file with `npx eslint src/path/to/file.tsx`, then run `npx tsc --noEmit`; use `npm run build` for the main end-to-end check.
 
 The development server may regenerate the Next.js agent rule block in `AGENTS.md`. Keep that block committed and do not remove it.
 
@@ -41,9 +41,13 @@ Service listings currently cross two data boundaries:
 
 - The Express API helpers in `src/lib/Action/api/` call `NEXT_PUBLIC_SERVER_API` for create, read, update, and delete operations.
 - Public and technician service pages fetch server-side and map raw API documents through `src/lib/service-mappers.ts`.
-- Dashboard listing/bookings/users use the client-side `DashboardStoreProvider` and `src/lib/dashboard-data.ts` as sample/in-memory state. Mutations only last until reload until MongoDB-backed dashboard collections replace it.
+- Customer bookings and technician booking requests fetch the Express API server-side. Admin dashboard listings/bookings/users and some overview metrics still use the client-side `DashboardStoreProvider` and `src/lib/dashboard-data.ts`; those sample-state mutations reset on reload.
 
 Role guards and redirects are centralized in `src/lib/dashboard-session.ts` and `src/lib/nav.ts`. Dashboard navigation is role-derived from `DASHBOARD_NAV` in `src/lib/dashboard-nav.ts`.
+
+The public services page forwards URL filters through `src/lib/services-query.ts` to the Express API and renders its results; keep API query construction in the shared query helpers rather than filtering service results again in the client. Technician booking requests are fetched by authenticated technician email and normalized in `src/lib/Action/api/get.data.api.ts`; their status filter is client-side in `src/components/dashboard/technician/booking-management.tsx`. Booking mutations use `updateBookingStatus()` in `src/lib/Action/api/update.data.api.ts`.
+
+Booking request fields and the persisted booking shape are defined separately in `src/types/type.ts`. Client-supplied customer, technician, and service fields are not authoritative: the backend must authenticate the user, check the customer role, and re-read service/technician data before creating a booking.
 
 ## Next.js 16 Conventions
 
