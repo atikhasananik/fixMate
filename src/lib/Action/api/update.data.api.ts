@@ -121,9 +121,6 @@ export const updateBookingStatus = async (
   return data;
 };
 
-
-
-
 export const updateBookingStatusByTechnician = async (
   id: string,
   status: BookingStatus,
