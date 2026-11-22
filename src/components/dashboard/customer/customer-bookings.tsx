@@ -5,6 +5,12 @@ import { ClipboardList, TriangleAlert } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Table,
   TableBody,
   TableCell,
@@ -84,24 +90,8 @@ export function CustomerBookings({ bookings, error }: CustomerBookingsProps) {
             description="Browse approved services and send your first repair request."
           />
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead className="hidden md:table-cell">
-                  Technician
-                </TableHead>
-                <TableHead className="hidden sm:table-cell">
-                  Preferred date
-                </TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
+          <>
+            <div className="grid gap-3 p-4 lg:hidden">
               {bookings.map((booking) => {
                 const amount =
                   (booking.finalAmount || 0) > booking.basePrice
@@ -109,54 +99,148 @@ export function CustomerBookings({ bookings, error }: CustomerBookingsProps) {
                     : booking.basePrice;
 
                 return (
-                  <TableRow key={booking.id}>
-                    <TableCell>
+                  <Card
+                    key={booking.id}
+                    className="gap-4 rounded-xl border border-border/70 py-4 shadow-none ring-0"
+                  >
+                    <CardHeader className="flex flex-row items-start justify-between gap-3 px-4">
                       <div className="flex min-w-0 items-center gap-3">
                         <ServiceThumbnail
                           title={booking.serviceTitle}
                           image={booking.serviceImage}
                         />
                         <div className="min-w-0">
-                          <span className="block truncate font-medium text-foreground">
+                          <CardTitle className="truncate text-sm">
                             {booking.serviceTitle}
-                          </span>
+                          </CardTitle>
                           {booking.category ? (
-                            <span className="block truncate text-xs text-muted-foreground">
+                            <p className="mt-1 truncate text-xs text-muted-foreground">
                               {booking.category}
-                            </span>
+                            </p>
                           ) : null}
                         </div>
                       </div>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">
-                      {booking.technicianName}
-                    </TableCell>
-                    <TableCell className="hidden whitespace-nowrap sm:table-cell">
-                      {formatDate(booking.preferredDate)}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap font-medium tabular-nums">
-                      {formatCurrency(amount?? 0)}
-                    </TableCell>
-                    <TableCell>
                       <StatusBadge kind="booking" status={booking.status} />
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge
-                        kind="payment"
-                        status={booking.paymentStatus}
-                      />
-                    </TableCell>
-                    <CustomerBookingsAction
-                      currentStatus={booking.status}
-                      id={booking.id}
-                      serviceTitle={booking.serviceTitle}
-                      paymentStatus = {booking.paymentStatus}
-                    />
-                  </TableRow>
+                    </CardHeader>
+
+                    <CardContent className="grid grid-cols-2 gap-x-4 gap-y-3 px-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          Technician
+                        </p>
+                        <p className="mt-0.5 truncate text-sm font-medium">
+                          {booking.technicianName}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">
+                          Preferred date
+                        </p>
+                        <p className="mt-0.5 text-sm font-medium">
+                          {formatDate(booking.preferredDate)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Amount</p>
+                        <p className="mt-0.5 text-sm font-medium tabular-nums">
+                          {formatCurrency(amount ?? 0)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Payment</p>
+                        <div className="mt-1">
+                          <StatusBadge
+                            kind="payment"
+                            status={booking.paymentStatus}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-span-2 border-t border-border/60 pt-3">
+                        <CustomerBookingsAction
+                          currentStatus={booking.status}
+                          id={booking.id}
+                          serviceTitle={booking.serviceTitle}
+                          paymentStatus={booking.paymentStatus}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
                 );
               })}
-            </TableBody>
-          </Table>
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Technician</TableHead>
+                    <TableHead>Preferred date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Payment</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {bookings.map((booking) => {
+                    const amount =
+                      (booking.finalAmount || 0) > booking.basePrice
+                        ? booking.finalAmount
+                        : booking.basePrice;
+
+                    return (
+                      <TableRow key={booking.id}>
+                        <TableCell>
+                          <div className="flex min-w-0 items-center gap-3">
+                            <ServiceThumbnail
+                              title={booking.serviceTitle}
+                              image={booking.serviceImage}
+                            />
+                            <div className="min-w-0">
+                              <span className="block truncate font-medium text-foreground">
+                                {booking.serviceTitle}
+                              </span>
+                              {booking.category ? (
+                                <span className="block truncate text-xs text-muted-foreground">
+                                  {booking.category}
+                                </span>
+                              ) : null}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{booking.technicianName}</TableCell>
+                        <TableCell className="whitespace-nowrap">
+                          {formatDate(booking.preferredDate)}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap font-medium tabular-nums">
+                          {formatCurrency(amount ?? 0)}
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge kind="booking" status={booking.status} />
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge
+                            kind="payment"
+                            status={booking.paymentStatus}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <CustomerBookingsAction
+                            currentStatus={booking.status}
+                            id={booking.id}
+                            serviceTitle={booking.serviceTitle}
+                            paymentStatus={booking.paymentStatus}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </TableCard>
     </div>

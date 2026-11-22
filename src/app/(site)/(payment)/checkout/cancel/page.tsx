@@ -1,11 +1,55 @@
-import React from 'react';
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ClipboardList, House, RotateCcw, TriangleAlert } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-const CancelPage = () => {
-    return (
-        <div>
-            this cancel page
-        </div>
-    );
+export const metadata: Metadata = {
+  title: "Payment Cancelled",
 };
 
-export default CancelPage;
+export default async function CancelPage({
+  searchParams,
+}: PageProps<"/checkout/cancel">) {
+  const { bookingId } = await searchParams;
+  const bookingIdValue = Array.isArray(bookingId) ? bookingId[0] : bookingId;
+  const retryHref = bookingIdValue
+    ? `/checkout/${bookingIdValue}`
+    : "/dashboard/customer/bookings";
+
+  return (
+    <main className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
+      <section className="rounded-2xl border border-border/60 bg-card p-8 text-center shadow-sm sm:p-12">
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative flex size-20 items-center justify-center rounded-full bg-amber-500/10">
+            <TriangleAlert className="size-16 text-amber-500" aria-hidden="true" />
+            <span className="absolute inset-0 animate-ping rounded-full border border-amber-500/30" />
+          </div>
+
+          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Payment Cancelled
+          </h1>
+
+          <p className="max-w-md text-base text-muted-foreground">
+            Your payment wasn&apos;t completed. No worries! Your booking details
+            are still available. You can try again whenever you&apos;re ready.
+          </p>
+        </div>
+
+        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Button render={<Link href={retryHref} />}>
+            <RotateCcw className="size-4" aria-hidden="true" />
+            Try Again
+          </Button>
+          <Button render={<Link href="/dashboard/customer/bookings" />} variant="outline">
+            <ClipboardList className="size-4" aria-hidden="true" />
+            View My Bookings
+          </Button>
+          <Button render={<Link href="/" />}>
+            <House className="size-4" aria-hidden="true" />
+            Back to Home
+          </Button>
+        </div>
+      </section>
+    </main>
+  );
+}

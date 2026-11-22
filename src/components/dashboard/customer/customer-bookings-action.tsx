@@ -13,7 +13,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { TableCell } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
 import { updateBookingStatus } from "@/lib/Action/api/update.data.api";
 import type { BookingStatus, PaymentStatus } from "@/types/type";
@@ -78,7 +77,7 @@ export default function CustomerBookingsAction({
   }
 
   return (
-    <TableCell>
+    <>
       <div className="flex justify-end gap-2">
         {currentStatus === "completed" && paymentStatus === "unpaid" ? (
           <Button
@@ -133,6 +132,6 @@ export default function CustomerBookingsAction({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </TableCell>
+    </>
   );
 }
