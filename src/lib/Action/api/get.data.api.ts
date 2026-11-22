@@ -4,6 +4,7 @@ import type {
   AdminBookingApiDocument,
   BookingApiDocument,
   BookingStatus,
+  CreatePaymentIntentResponse,
   CustomerBooking,
   GetAdminBookingsResponse,
   GetBookingByIdResponse,
@@ -231,6 +232,38 @@ export async function getBookingById(
   } catch {
     return null;
   }
+}
+
+// Creates a Stripe Checkout session for a booking so the customer can pay.
+export async function createPaymentIntent(
+  payload: { bookingId: string },
+): Promise<CreatePaymentIntentResponse> {
+  if (!BASE_URL) {
+    throw new Error("The service API is not configured.");
+  }
+
+  console.log(payload);
+  const res = await fetch(`${BASE_URL}/create-payment-intent`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  const data = (await res.json().catch(() => null)) as
+    | CreatePaymentIntentResponse
+    | null;
+
+  if (!res.ok) {
+    const message = data?.message;
+    throw new Error(message ?? `Couldn't create the payment (${res.status}).`);
+  }
+
+  if (!data || typeof data.success !== "boolean") {
+    throw new Error("The payment API returned an unexpected response.");
+  }
+
+  return data;
 }
 
 const isBookingStatus = (status: string): status is BookingStatus =>

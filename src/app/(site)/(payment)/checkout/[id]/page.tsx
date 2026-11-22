@@ -8,27 +8,38 @@ import { ServiceThumbnail } from "@/components/dashboard/shared/service-thumbnai
 import { formatCurrency, formatDate } from "@/lib/format";
 import { getBookingById } from "@/lib/Action/api/get.data.api";
 import type { CustomerBooking } from "@/types/type";
+import { PayNowButton } from "@/components/checkout/pay-now-button";
 import { notFound } from "next/navigation";
+import {
+  CalendarDays,
+  CreditCard,
+  Hash,
+  ShieldCheck,
+  User,
+  Wrench,
+} from "lucide-react";
 
 const CHECKOUT_CONTENT_CLASS =
-  "mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:px-8";
+  "mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 lg:px-8";
 
 function CheckoutBookingSkeleton() {
   return (
     <div className={CHECKOUT_CONTENT_CLASS} aria-hidden="true">
-      <Skeleton className="h-8 w-44" />
-      <div className="mt-8 overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
-        <Skeleton className="aspect-16/6 w-full rounded-none" />
-        <div className="space-y-3 p-6">
-          <Skeleton className="h-5 w-2/3" />
+      <Skeleton className="aspect-4/3 w-full rounded-xl" />
+      <div className="mt-8 grid gap-8 lg:grid-cols-2 lg:items-start">
+        <div className="space-y-4">
+          <Skeleton className="h-8 w-2/3" />
           <Skeleton className="h-4 w-1/3" />
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
+          <Skeleton className="h-40 w-full rounded-xl" />
+        </div>
+        <div className="space-y-4 rounded-xl border border-border/60 bg-card p-6 shadow-sm">
+          <Skeleton className="h-6 w-1/2" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/3" />
         </div>
       </div>
-      <Skeleton className="mt-8 h-11 w-full sm:w-44" />
+      <Skeleton className="mt-8 h-40 w-full rounded-xl" />
     </div>
   );
 }
@@ -72,28 +83,61 @@ async function CheckoutBooking({ id }: { id: string }) {
 
   return (
     <div className={CHECKOUT_CONTENT_CLASS}>
-      <div className="mt-8 rounded-xl border border-border/60 bg-card p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+      <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
+        {/* Service image */}
+        <div className="overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
           <ServiceThumbnail
             title={booking.serviceTitle}
             image={booking.serviceImage}
-            className="size-14 rounded-xl"
+            className="aspect-4/3 w-full rounded-none border-0"
           />
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-semibold text-foreground">
-                {booking.serviceTitle}
-              </h2>
-              <StatusBadge kind="booking" status={booking.status} />
-            </div>
-            {booking.category ? (
-              <p className="mt-1 text-sm text-muted-foreground">
-                {booking.category}
-              </p>
-            ) : null}
+        </div>
 
-            <dl className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2">
-              <div>
+        {/* Booking details */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+              {booking.serviceTitle}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <StatusBadge kind="booking" status={booking.status} />
+              <StatusBadge kind="payment" status={booking.paymentStatus} />
+            </div>
+          </div>
+
+          <dl className="grid gap-5 rounded-xl border border-border/60 bg-card p-6 shadow-sm">
+            <div className="flex items-start gap-3">
+              <Wrench
+                className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Service
+                </dt>
+                <dd className="mt-1 text-sm text-foreground">
+                  {booking.serviceTitle}
+                </dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <Hash
+                className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
+                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Booking ID
+                </dt>
+                <dd className="mt-1 text-sm text-foreground">{booking.id}</dd>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <User
+                className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Technician
                 </dt>
@@ -101,7 +145,13 @@ async function CheckoutBooking({ id }: { id: string }) {
                   {booking.technicianName}
                 </dd>
               </div>
-              <div>
+            </div>
+            <div className="flex items-start gap-3">
+              <CalendarDays
+                className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <div className="min-w-0">
                 <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   Preferred date
                 </dt>
@@ -109,35 +159,39 @@ async function CheckoutBooking({ id }: { id: string }) {
                   {formatDate(booking.preferredDate)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Amount
-                </dt>
-                <dd className="mt-1 text-sm font-medium text-foreground">
-                  {formatCurrency(amount)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Payment
-                </dt>
-                <dd className="mt-1">
-                  <StatusBadge kind="payment" status={booking.paymentStatus} />
-                </dd>
-              </div>
-            </dl>
-          </div>
+            </div>
+          </dl>
         </div>
       </div>
 
-      <Button
-        type="button"
-        render={<Link href="/checkout/success" />}
-        size="lg"
-        className="mt-8 bg-blue-600 text-white hover:bg-blue-700"
-      >
-        Pay Now
-      </Button>
+      {/* Payment */}
+      <section className="mt-8 rounded-xl border border-border/60 bg-card p-6 shadow-sm sm:p-8">
+        <div className="flex items-start gap-3">
+          <ShieldCheck
+            className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+          <p className="text-sm text-muted-foreground">
+            You&apos;re one step away from confirming your booking. Complete
+            your payment securely to proceed.
+          </p>
+        </div>
+        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Total payable
+            </p>
+            <p className="mt-1 flex items-center gap-2 text-3xl font-bold tracking-tight text-foreground">
+              <CreditCard
+                className="size-5 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
+              {formatCurrency(amount)}
+            </p>
+          </div>
+          <PayNowButton bookingId={booking.id} />
+        </div>
+      </section>
     </div>
   );
 }

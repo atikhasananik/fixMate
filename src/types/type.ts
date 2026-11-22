@@ -367,6 +367,16 @@ export type GetBookingByIdResponse = {
   result?: BookingApiDocument | null;
 };
 
+export type CreatePaymentIntentResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: {
+    url?: string;
+    sessionId?: string;
+  };
+};
+
 export type UpdateBookingStatusResponse = {
   success?: boolean;
   message?: string;
