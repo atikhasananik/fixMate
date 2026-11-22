@@ -25,6 +25,12 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
   Table,
   TableBody,
   TableCell,
@@ -53,6 +59,101 @@ import {
   updateServiceData,
 } from "@/lib/Action/api/update.data.api";
 import { buildServiceFields } from "@/lib/service-payload";
+
+type ServiceCardProps = {
+  service: TechnicianService;
+  isUpdating: boolean;
+  isAvailabilityUpdateRunning: boolean;
+  onAvailabilityChange: (service: TechnicianService, isAvailable: boolean) => void;
+  onEdit: (service: TechnicianService) => void;
+  onDelete: (service: TechnicianService) => void;
+};
+
+function ServiceCard({
+  service,
+  isUpdating,
+  isAvailabilityUpdateRunning,
+  onAvailabilityChange,
+  onEdit,
+  onDelete,
+}: ServiceCardProps) {
+  return (
+    <Card className="gap-4 rounded-xl border border-border/70 py-4 shadow-none ring-0">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 px-4">
+        <div className="min-w-0">
+          <CardTitle className="truncate text-sm">
+            {service.title || "Untitled service"}
+          </CardTitle>
+          <p className="mt-1 truncate text-xs text-muted-foreground">
+            {service.category || "Uncategorized"}
+          </p>
+        </div>
+        <StatusBadge kind="approval" status={service.approvalStatus} />
+      </CardHeader>
+
+      <CardContent className="grid grid-cols-2 gap-x-4 gap-y-3 px-4">
+        <div>
+          <p className="text-xs text-muted-foreground">Mode</p>
+          <p className="mt-0.5 text-sm font-medium">
+            {SERVICE_MODE_LABELS[service.serviceMode] ?? "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Price</p>
+          <p className="mt-0.5 text-sm font-medium tabular-nums">
+            {formatCurrency(service.basePrice)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Duration</p>
+          <p className="mt-0.5 text-sm font-medium">
+            {service.estimatedDuration || "—"}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">Service area</p>
+          <p className="mt-0.5 truncate text-sm font-medium">
+            {service.serviceArea || "—"}
+          </p>
+        </div>
+
+        <div className="col-span-2 flex items-center justify-between border-t border-border/60 pt-3">
+          <span className="text-sm font-medium">Available to customers</span>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={service.isAvailable}
+              disabled={isAvailabilityUpdateRunning}
+              onCheckedChange={(checked) =>
+                onAvailabilityChange(service, checked)
+              }
+              aria-label={`Toggle availability for ${service.title}`}
+            />
+            {isUpdating ? <Spinner className="size-3.5" /> : null}
+          </div>
+        </div>
+
+        <div className="col-span-2 grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => onEdit(service)}
+          >
+            <Pencil aria-hidden="true" />
+            Edit
+          </Button>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => onDelete(service)}
+          >
+            <Trash2 aria-hidden="true" />
+            Delete
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export function TechnicianServices({
   services: initialServices,
@@ -216,83 +317,101 @@ export function TechnicianServices({
             </Button>
           </EmptyState>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Service</TableHead>
-                <TableHead className="hidden md:table-cell">Mode</TableHead>
-                <TableHead className="hidden lg:table-cell">Duration</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Approval</TableHead>
-                <TableHead>Available</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
+          <>
+            <div className="grid gap-3 p-4 lg:hidden">
               {services.map((service) => (
-                <TableRow key={service.id}>
-                  <TableCell>
-                    <ServiceCell
-                      title={service.title || "Untitled service"}
-                      category={service.category || "Uncategorized"}
-                      image={service.image}
-                    />
-                  </TableCell>
-                  <TableCell className="hidden whitespace-nowrap md:table-cell">
-                    {SERVICE_MODE_LABELS[service.serviceMode] ?? "—"}
-                  </TableCell>
-                  <TableCell className="hidden whitespace-nowrap lg:table-cell">
-                    {service.estimatedDuration || "—"}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap font-medium tabular-nums">
-                    {formatCurrency(service.basePrice)}
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge
-                      kind="approval"
-                      status={service.approvalStatus}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Switch
-                        checked={service.isAvailable}
-                        disabled={Boolean(updatingAvailabilityId)}
-                        onCheckedChange={(checked) =>
-                          handleAvailability(service, checked)
-                        }
-                        aria-label={`Toggle availability for ${service.title}`}
-                      />
-                      {updatingAvailabilityId === service.id ? (
-                        <Spinner className="size-3.5" />
-                      ) : null}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditing(service)}
-                      >
-                        <Pencil aria-hidden="true" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => setDeleting(service)}
-                      >
-                        <Trash2 aria-hidden="true" />
-                        Delete
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  isUpdating={updatingAvailabilityId === service.id}
+                  isAvailabilityUpdateRunning={Boolean(updatingAvailabilityId)}
+                  onAvailabilityChange={handleAvailability}
+                  onEdit={setEditing}
+                  onDelete={setDeleting}
+                />
               ))}
-            </TableBody>
-          </Table>
+            </div>
+
+            <div className="hidden overflow-x-auto lg:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Service</TableHead>
+                    <TableHead>Mode</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Approval</TableHead>
+                    <TableHead>Available</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+
+                <TableBody>
+                  {services.map((service) => (
+                    <TableRow key={service.id}>
+                      <TableCell>
+                        <ServiceCell
+                          title={service.title || "Untitled service"}
+                          category={service.category || "Uncategorized"}
+                          image={service.image}
+                        />
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {SERVICE_MODE_LABELS[service.serviceMode] ?? "—"}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {service.estimatedDuration || "—"}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap font-medium tabular-nums">
+                        {formatCurrency(service.basePrice)}
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          kind="approval"
+                          status={service.approvalStatus}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={service.isAvailable}
+                            disabled={Boolean(updatingAvailabilityId)}
+                            onCheckedChange={(checked) =>
+                              handleAvailability(service, checked)
+                            }
+                            aria-label={`Toggle availability for ${service.title}`}
+                          />
+                          {updatingAvailabilityId === service.id ? (
+                            <Spinner className="size-3.5" />
+                          ) : null}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditing(service)}
+                          >
+                            <Pencil aria-hidden="true" />
+                            Edit
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleting(service)}
+                          >
+                            <Trash2 aria-hidden="true" />
+                            Delete
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         )}
       </TableCard>
 

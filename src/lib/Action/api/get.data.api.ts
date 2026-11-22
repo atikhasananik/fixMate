@@ -7,6 +7,7 @@ import type {
   CustomerBooking,
   GetAdminBookingsResponse,
   GetBookingsResponse,
+  GetFeaturedServicesResponse,
   GetServicesResponse,
   GetSingleServiceResponse,
   GetUsersResponse,
@@ -52,6 +53,22 @@ export async function getAllServiceData(
   }
 
   const data = (await res.json()) as GetServicesResponse;
+
+  return Array.isArray(data.result) ? data.result : [];
+}
+
+// The six newest approved + available services for the homepage. The backend
+// owns the filter, ordering and limit.
+export async function getFeaturedServiceData(): Promise<ServiceApiItem[]> {
+  const res = await fetch(`${BASE_URL}/get-featured-services`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    throw new Error(`Couldn't load featured services (${res.status}).`);
+  }
+
+  const data = (await res.json()) as GetFeaturedServicesResponse;
 
   return Array.isArray(data.result) ? data.result : [];
 }

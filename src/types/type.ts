@@ -448,6 +448,13 @@ export type GetServicesResponse = {
   result?: ServiceApiItem[];
 };
 
+export type GetFeaturedServicesResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: ServiceApiItem[];
+};
+
 export type GetSingleServiceResponse = {
   status?: number;
   message?: string;

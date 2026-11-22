@@ -29,7 +29,7 @@ import { EmptyState } from "@/components/dashboard/shared/empty-state";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { TableCard } from "@/components/dashboard/shared/table-card";
 import { useDashboardStore } from "@/components/dashboard/shared/dashboard-store";
-import { updateUserRoleAction } from "@/lib/Action/update-role.action";
+import { updateUserRoleAction } from "@/lib/Action/api/update-role.action";
 import { formatDate } from "@/lib/format";
 import { ROLE_LABELS, getInitials } from "@/lib/nav";
 import type { PlatformUser, UserRole } from "@/types/type";

@@ -15,6 +15,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { HeroSection } from "@/components/home/hero-section";
+import { FeaturedServices } from "@/components/home/featured-services";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { PopularCategories } from "@/components/home/popular-categories";
 import { WhyChooseUs } from "@/components/home/why-choose-us";
@@ -186,6 +187,8 @@ export default function Home() {
           "Pay after service",
         ]}
       />
+
+      <FeaturedServices />
 
       <HowItWorks
         eyebrow="How it works"
