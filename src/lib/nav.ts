@@ -3,7 +3,7 @@ import type { UserRole } from "@/types/type";
 export const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "Services", href: "/services" },
-  { label: "How It Works", href: "/about" },
+  { label: "How It Works", href: "/#how-it-works" },
 ] as const;
 
 export const ROLE_LABELS: Record<UserRole, string> = {

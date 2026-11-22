@@ -176,7 +176,7 @@ export default function Home() {
         }
         description="Book trusted professionals for smartphones, laptops, and home appliances. Transparent pricing, real-time tracking, and pay only after the repair is done."
         primaryAction={{ label: "Browse Services", href: "/services" }}
-        secondaryAction={{ label: "How It Works", href: "/about" }}
+        secondaryAction={{ label: "How It Works", href: "/#how-it-works" }}
         image={{
           src: "/hero-technician.svg",
           alt: "Illustration of a smartphone being repaired with a screwdriver and a gear",
