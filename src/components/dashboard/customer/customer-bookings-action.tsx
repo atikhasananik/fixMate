@@ -17,6 +17,7 @@ import { TableCell } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
 import { updateBookingStatus } from "@/lib/Action/api/update.data.api";
 import type { BookingStatus, PaymentStatus } from "@/types/type";
+import Link from "next/link";
 
 interface CustomerBookingsActionProps {
   currentStatus: BookingStatus;
@@ -82,7 +83,7 @@ export default function CustomerBookingsAction({
         {currentStatus === "completed" && paymentStatus === "unpaid" ? (
           <Button
             type="button"
-            
+            render={<Link href={`/checkout/${id}`} ></Link>}
             className={`bg-blue-600 text-white hover:bg-blue-700 `}
             size="sm"
           >

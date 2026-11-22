@@ -360,6 +360,13 @@ export type GetBookingsResponse = {
   result?: BookingApiDocument[] | { bookings?: BookingApiDocument[] };
 };
 
+export type GetBookingByIdResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: BookingApiDocument | null;
+};
+
 export type UpdateBookingStatusResponse = {
   success?: boolean;
   message?: string;

@@ -6,6 +6,7 @@ import type {
   BookingStatus,
   CustomerBooking,
   GetAdminBookingsResponse,
+  GetBookingByIdResponse,
   GetBookingsResponse,
   GetFeaturedServicesResponse,
   GetServicesResponse,
@@ -191,6 +192,45 @@ export async function getBookingData(
   }
 
   return result.map(toCustomerBooking);
+}
+
+// Fetches a single booking by id for the checkout flow. Returns null when the
+// booking does not exist so callers can render a not-found state.
+export async function getBookingById(
+  id: string,
+): Promise<CustomerBooking | null> {
+  if (!BASE_URL) {
+    throw new Error("The service API is not configured.");
+  }
+
+  const res = await fetch(
+    `${BASE_URL}/get-booking-by-id/${encodeURIComponent(id)}`,
+    { cache: "no-store" },
+  );
+  const data = (await res.json().catch(() => null)) as
+    | GetBookingByIdResponse
+    | null;
+
+  if (!res.ok) {
+    if (res.status === 404) {
+      return null;
+    }
+
+    const message = data?.message;
+    throw new Error(message ?? `Couldn't load booking (${res.status}).`);
+  }
+
+  const result = data?.result;
+
+  if (!result) {
+    return null;
+  }
+
+  try {
+    return toCustomerBooking(result);
+  } catch {
+    return null;
+  }
 }
 
 const isBookingStatus = (status: string): status is BookingStatus =>
