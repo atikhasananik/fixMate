@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
-import { ReceiptText } from "lucide-react";
-import { EmptyState } from "@/components/dashboard/shared/empty-state";
+import { Suspense } from "react";
+import {
+  AdminTransactions,
+  AdminTransactionsSkeleton,
+} from "@/components/dashboard/admin/admin-transactions";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { getAllPayments } from "@/lib/Action/api/get.data.api";
+import type { PaymentApiDocument } from "@/types/type";
 
 export const metadata: Metadata = {
   title: "Transactions",
@@ -12,16 +17,28 @@ export default function AdminTransactionsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Transactions"
-        description="Platform payment records will be available here once checkout is connected."
+        description="Every payment collected on the platform, across all customers and technicians."
       />
 
-      <div className="rounded-xl border border-border/70 bg-card shadow-sm">
-        <EmptyState
-          icon={ReceiptText}
-          title="No transactions yet"
-          description="Stripe checkout records, amounts, and payout status will be listed on this page."
-        />
-      </div>
+      <Suspense fallback={<AdminTransactionsSkeleton />}>
+        <AdminTransactionsSection />
+      </Suspense>
     </div>
   );
+}
+
+async function AdminTransactionsSection() {
+  let payments: PaymentApiDocument[] = [];
+  let error: string | null = null;
+
+  try {
+    payments = await getAllPayments();
+  } catch (fetchError) {
+    error =
+      fetchError instanceof Error
+        ? fetchError.message
+        : "Couldn't load transactions. Please try again.";
+  }
+
+  return <AdminTransactions payments={payments} error={error} />;
 }

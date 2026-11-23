@@ -270,7 +270,7 @@ export async function createPaymentIntent(
   return data;
 }
 
-const toPaymentRecordStatus = (status?: string): PaymentRecordStatus => {
+export const toPaymentRecordStatus = (status?: string): PaymentRecordStatus => {
   if (status === "paid" || status === "unpaid" || status === "no_payment_required") {
     return status;
   }
@@ -335,6 +335,38 @@ export async function getPaymentData(
   return result
     .map(toCustomerPayment)
     .sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? ""));
+}
+
+/**
+ * Fetches every payment record on the platform, newest first. The admin
+ * transactions overview uses this; the backend owns the query.
+ */
+export async function getAllPayments(): Promise<PaymentApiDocument[]> {
+  if (!BASE_URL) {
+    throw new Error("The service API is not configured.");
+  }
+
+  const res = await fetch(`${BASE_URL}/get-payments`, { cache: "no-store" });
+  const data = (await res.json().catch(() => null)) as
+    | GetPaymentsResponse
+    | PaymentApiDocument[]
+    | null;
+
+  if (!res.ok) {
+    const message = data && !Array.isArray(data) ? data.message : undefined;
+    throw new Error(message ?? `Couldn't load payments (${res.status}).`);
+  }
+
+  const result = Array.isArray(data) ? data : data?.result;
+
+  if (!Array.isArray(result)) {
+    throw new Error("The payments API returned an unexpected response.");
+  }
+
+  // The API returns payments in insertion order; show the latest first.
+  return [...result].sort(
+    (a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? ""),
+  );
 }
 
 const isBookingStatus = (status: string): status is BookingStatus =>

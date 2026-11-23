@@ -37,7 +37,7 @@ const OTHER_PAYMENT_LABELS: Record<"no_payment_required" | "unknown", string> = 
 };
 
 /** Paid/unpaid reuse the shared badge; other Stripe values get a neutral one. */
-function PaymentBadge({ status }: { status: PaymentRecordStatus }) {
+export function PaymentBadge({ status }: { status: PaymentRecordStatus }) {
   if (status === "paid" || status === "unpaid") {
     return <StatusBadge kind="payment" status={status} />;
   }

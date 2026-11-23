@@ -746,6 +746,11 @@ export type CustomerPaymentsProps = {
   error?: string | null;
 };
 
+export type AdminTransactionsProps = {
+  payments: PaymentApiDocument[];
+  error?: string | null;
+};
+
 export type EmptyStateProps = {
   icon: LucideIcon;
   title: string;

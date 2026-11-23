@@ -5,6 +5,7 @@ import {
   CreditCard,
   HardHat,
   Inbox,
+  ReceiptText,
   ShieldCheck,
   Wrench,
 } from "lucide-react";
@@ -14,6 +15,7 @@ import type {
   CustomerPayment,
   DashboardStat,
   IServiceData,
+  PaymentApiDocument,
   PlatformUser,
   ServiceApprovalStatus,
   ServiceListing,
@@ -349,6 +351,51 @@ export function getCustomerStats(
         paidPayments.length > 0
           ? `${formatMoney(totalPaid)} paid in total`
           : "No completed payments yet",
+    },
+  ];
+}
+
+/**
+ * Transaction overview stats for the admin transactions page. Revenue only
+ * counts payments that were actually paid.
+ */
+export function getTransactionStats(
+  payments: PaymentApiDocument[],
+): DashboardStat[] {
+  const successfulPayments = payments.filter(
+    (payment) => payment.paymentStatus === "paid",
+  );
+  const totalRevenue = successfulPayments.reduce(
+    (sum, payment) => sum + (Number(payment.amount) || 0),
+    0,
+  );
+
+  return [
+    {
+      label: "Total transactions",
+      value: payments.length,
+      icon: ReceiptText,
+      hint: "Every payment record on the platform",
+    },
+    {
+      label: "Successful payments",
+      value: successfulPayments.length,
+      icon: CircleCheck,
+      hint: "Payments confirmed as paid",
+    },
+    {
+      label: "Pending payments",
+      value: payments.filter(
+        (payment) => payment.paymentStatus === "unpaid",
+      ).length,
+      icon: Inbox,
+      hint: "Waiting for the customer to complete payment",
+    },
+    {
+      label: "Total revenue",
+      value: Math.round(totalRevenue * 100) / 100,
+      icon: CreditCard,
+      hint: "Collected through successful payments",
     },
   ];
 }
