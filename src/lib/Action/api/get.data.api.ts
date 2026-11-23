@@ -6,13 +6,17 @@ import type {
   BookingStatus,
   CreatePaymentIntentResponse,
   CustomerBooking,
+  CustomerPayment,
   GetAdminBookingsResponse,
   GetBookingByIdResponse,
   GetBookingsResponse,
   GetFeaturedServicesResponse,
+  GetPaymentsResponse,
   GetServicesResponse,
   GetSingleServiceResponse,
   GetUsersResponse,
+  PaymentApiDocument,
+  PaymentRecordStatus,
   PlatformUser,
   PlatformUserApiDocument,
   ServiceApiItem,
@@ -264,6 +268,73 @@ export async function createPaymentIntent(
   }
 
   return data;
+}
+
+const toPaymentRecordStatus = (status?: string): PaymentRecordStatus => {
+  if (status === "paid" || status === "unpaid" || status === "no_payment_required") {
+    return status;
+  }
+
+  return "unknown";
+};
+
+function toCustomerPayment(item: PaymentApiDocument): CustomerPayment {
+  const id = item._id;
+
+  if (!id) {
+    throw new Error("The payments response contains an invalid payment.");
+  }
+
+  const amount = Number(item.amount);
+
+  return {
+    id,
+    bookingId: item.bookingId ?? "",
+    serviceTitle: item.serviceTitle?.trim() || undefined,
+    technicianName: item.technicianName?.trim() || undefined,
+    amount: Number.isFinite(amount) ? amount : 0,
+    currency: item.currency?.trim() || "usd",
+    status: toPaymentRecordStatus(item.paymentStatus),
+    paidAt: item.paidAt || undefined,
+    transactionId: item.transactionId?.trim() || undefined,
+  };
+}
+
+/**
+ * Fetches the payment history of one customer. The caller passes the email
+ * from the signed-in session, so only that customer's payments are loaded.
+ */
+export async function getPaymentData(
+  email: string,
+): Promise<CustomerPayment[]> {
+  if (!BASE_URL) {
+    throw new Error("The service API is not configured.");
+  }
+
+  const res = await fetch(
+    `${BASE_URL}/get-payment/${encodeURIComponent(email)}`,
+    { cache: "no-store" },
+  );
+  const data = (await res.json().catch(() => null)) as
+    | GetPaymentsResponse
+    | PaymentApiDocument[]
+    | null;
+
+  if (!res.ok) {
+    const message = data && !Array.isArray(data) ? data.message : undefined;
+    throw new Error(message ?? `Couldn't load your payments (${res.status}).`);
+  }
+
+  const result = Array.isArray(data) ? data : data?.result;
+
+  if (!Array.isArray(result)) {
+    throw new Error("The payments API returned an unexpected response.");
+  }
+
+  // The API returns payments in insertion order; show the latest first.
+  return result
+    .map(toCustomerPayment)
+    .sort((a, b) => (b.paidAt ?? "").localeCompare(a.paidAt ?? ""));
 }
 
 const isBookingStatus = (status: string): status is BookingStatus =>

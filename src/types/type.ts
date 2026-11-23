@@ -377,6 +377,53 @@ export type CreatePaymentIntentResponse = {
   };
 };
 
+/**
+ * Payment status as stored by the Stripe webhook. Stripe reports the checkout
+ * session status, which is wider than a booking's paid/unpaid flag.
+ */
+export type PaymentRecordStatus =
+  | "paid"
+  | "unpaid"
+  | "no_payment_required"
+  | "unknown";
+
+/** Raw document returned by `GET /get-payment/:customerEmail`. */
+export type PaymentApiDocument = {
+  _id?: string;
+  bookingId?: string;
+  customerName?: string;
+  customerEmail?: string;
+  technicianEmail?: string;
+  technicianName?: string;
+  serviceTitle?: string;
+  amount?: number | string;
+  currency?: string;
+  transactionId?: string;
+  stripeSessionId?: string;
+  paymentStatus?: string;
+  paidAt?: string;
+};
+
+export type GetPaymentsResponse = {
+  status?: number;
+  success?: boolean;
+  message?: string;
+  result?: PaymentApiDocument[];
+};
+
+/** Normalised payment shape used by the Payment History table and cards. */
+export type CustomerPayment = {
+  id: string;
+  bookingId: string;
+  serviceTitle?: string;
+  technicianName?: string;
+  amount: number;
+  currency: string;
+  status: PaymentRecordStatus;
+  paidAt?: string;
+  transactionId?: string;
+};
+
 export type UpdateBookingStatusResponse = {
   success?: boolean;
   message?: string;
@@ -692,6 +739,11 @@ export type TableCardProps = {
   action?: ReactNode;
   children: ReactNode;
   className?: string;
+};
+
+export type CustomerPaymentsProps = {
+  payments: CustomerPayment[];
+  error?: string | null;
 };
 
 export type EmptyStateProps = {
