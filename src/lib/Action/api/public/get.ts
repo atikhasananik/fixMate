@@ -1,18 +1,28 @@
 import { BASE_URL } from "@/lib/Action/api/shared";
+import { auth } from "@/lib/auth";
 import type {
   GetFeaturedServicesResponse,
   GetServicesResponse,
   GetSingleServiceResponse,
   ServiceApiItem,
 } from "@/types/type";
+import { headers } from "next/headers";
 
 /** Every service listing, used by the public services page. The backend owns searching/filtering/sorting. */
 export async function getAllServiceData(
   queryString = "",
 ): Promise<ServiceApiItem[]> {
+  const jwtToken = await auth.api.getToken({ headers: await headers() });
+  const token = jwtToken.token;
+  console.log(jwtToken.token);
+
   const suffix = queryString ? `?${queryString}` : "";
   const res = await fetch(`${BASE_URL}/get-all-services${suffix}`, {
     cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
   });
 
   if (!res.ok) {
