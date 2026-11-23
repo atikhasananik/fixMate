@@ -7,9 +7,11 @@ import {
   Inbox,
   ReceiptText,
   ShieldCheck,
+  Users,
   Wrench,
 } from "lucide-react";
 import type {
+  AdminBooking,
   Booking,
   BookingStatus,
   CustomerPayment,
@@ -17,6 +19,7 @@ import type {
   IServiceData,
   PaymentApiDocument,
   PlatformUser,
+  ServiceApiItem,
   ServiceApprovalStatus,
   ServiceListing,
   ServiceMode,
@@ -396,6 +399,63 @@ export function getTransactionStats(
       value: Math.round(totalRevenue * 100) / 100,
       icon: CreditCard,
       hint: "Collected through successful payments",
+    },
+  ];
+}
+
+/**
+ * Platform-wide statistics for the admin overview. Every value is computed
+ * from the arrays the caller already fetched, so nothing is hardcoded.
+ */
+export function getPlatformStats(
+  users: PlatformUser[],
+  services: ServiceApiItem[],
+  bookings: AdminBooking[],
+  payments: PaymentApiDocument[],
+): DashboardStat[] {
+  const totalCustomers = users.filter(
+    (user) => user.role === "customer",
+  ).length;
+  const totalTechnicians = users.filter(
+    (user) => user.role === "technician",
+  ).length;
+
+  return [
+    {
+      label: "Total users",
+      value: users.length,
+      icon: ShieldCheck,
+      hint: "Customers, technicians, and admins",
+    },
+    {
+      label: "Total customers",
+      value: totalCustomers,
+      icon: Users,
+      hint: "Accounts that book repair services",
+    },
+    {
+      label: "Total technicians",
+      value: totalTechnicians,
+      icon: HardHat,
+      hint: "Accounts that accept repair jobs",
+    },
+    {
+      label: "Total services",
+      value: services.length,
+      icon: Wrench,
+      hint: "Service listings on the platform",
+    },
+    {
+      label: "Total bookings",
+      value: bookings.length,
+      icon: CalendarCheck,
+      hint: "Repair requests across all customers",
+    },
+    {
+      label: "Total transactions",
+      value: payments.length,
+      icon: ReceiptText,
+      hint: "Payments recorded through checkout",
     },
   ];
 }

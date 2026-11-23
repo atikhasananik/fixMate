@@ -751,6 +751,14 @@ export type AdminTransactionsProps = {
   error?: string | null;
 };
 
+export type AdminOverviewProps = {
+  users: PlatformUser[];
+  services: ServiceApiItem[];
+  bookings: AdminBooking[];
+  payments: PaymentApiDocument[];
+  error?: string | null;
+};
+
 export type EmptyStateProps = {
   icon: LucideIcon;
   title: string;
