@@ -85,11 +85,11 @@ async function CheckoutBooking({ id }: { id: string }) {
     <div className={CHECKOUT_CONTENT_CLASS}>
       <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
         {/* Service image */}
-        <div className="overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm">
+        <div className="overflow-hidden rounded-xl h-[40vh] border border-border/60 bg-card shadow-sm">
           <ServiceThumbnail
             title={booking.serviceTitle}
             image={booking.serviceImage}
-            className="aspect-4/3 w-full rounded-none border-0"
+            className=" w-full h-full rounded-none border-0"
           />
         </div>
 
