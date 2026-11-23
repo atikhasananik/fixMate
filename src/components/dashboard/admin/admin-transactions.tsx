@@ -14,7 +14,7 @@ import { StatsGrid } from "@/components/dashboard/shared/stat-card";
 import { TableCard } from "@/components/dashboard/shared/table-card";
 import { PaymentBadge } from "@/components/dashboard/customer/customer-payments";
 import { getTransactionStats } from "@/lib/dashboard-data";
-import { toPaymentRecordStatus } from "@/lib/Action/api/get.data.api";
+import { toPaymentRecordStatus } from "@/lib/Action/api/customer/get";
 import { formatDate, formatMoney } from "@/lib/format";
 import type {
   AdminTransactionsProps,

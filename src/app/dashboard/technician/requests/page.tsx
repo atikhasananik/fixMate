@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { BookingManagement } from "@/components/dashboard/technician/booking-management";
-import { getTechnicianBookingRequests } from "@/lib/Action/api/get.data.api";
+import { getTechnicianBookingRequests } from "@/lib/Action/api/technician/get";
 import { buildBookingsApiQuery } from "@/lib/bookings-query";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";

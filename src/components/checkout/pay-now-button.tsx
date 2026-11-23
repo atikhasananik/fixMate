@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { createPaymentIntent } from "@/lib/Action/api/get.data.api";
+import { createPaymentIntent } from "@/lib/Action/api/customer/post";
 
 type PayNowButtonProps = {
   bookingId: string;

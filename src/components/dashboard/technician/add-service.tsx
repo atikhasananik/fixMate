@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "@/components/ui/toast";
 import { buildServiceData } from "@/lib/service-payload";
 import type { ServiceFormValues } from "@/types/type";
-import { postServive } from "@/lib/Action/api/post.data.api";
+import { postServive } from "@/lib/Action/api/technician/post";
 
 export function AddService() {
   const router = useRouter();

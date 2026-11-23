@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CustomerBookings } from "@/components/dashboard/customer/customer-bookings";
 import { getDashboardSession } from "@/lib/dashboard-session";
-import { getBookingData } from "@/lib/Action/api/get.data.api";
+import { getBookingData } from "@/lib/Action/api/customer/get";
 
 export const metadata: Metadata = {
   title: "My Bookings",

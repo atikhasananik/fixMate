@@ -1,4 +1,4 @@
-import { BASE_URL } from "./post.data.api";
+import { BASE_URL } from "@/lib/Action/api/shared";
 
 export const deleteService = async (id: string) => {
   const res = await fetch(`${BASE_URL}/delete-service/${id}`, {

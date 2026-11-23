@@ -27,7 +27,7 @@ import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { ServiceCell } from "@/components/dashboard/shared/service-thumbnail";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { TableCard } from "@/components/dashboard/shared/table-card";
-import { updateServiceApprovalStatus } from "@/lib/Action/api/update.data.api";
+import { updateServiceApprovalStatus } from "@/lib/Action/api/admin/update";
 import {
   buildAdminServicesSearchParams,
   readAdminServiceParam,

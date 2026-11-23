@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { TechnicianServices } from "@/components/dashboard/technician/technician-services";
-import { getServiceData } from "@/lib/Action/api/get.data.api";
+import { getServiceData } from "@/lib/Action/api/technician/get";
 import { getDashboardSession } from "@/lib/dashboard-session";
 import { toTechnicianService } from "@/lib/service-mappers";
 import type { TechnicianService } from "@/types/type";

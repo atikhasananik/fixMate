@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/toast";
-import { updateBookingStatus } from "@/lib/Action/api/update.data.api";
+import { updateBookingStatus } from "@/lib/Action/api/customer/update";
 import type { BookingStatus, PaymentStatus } from "@/types/type";
 import Link from "next/link";
 

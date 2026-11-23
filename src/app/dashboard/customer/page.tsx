@@ -7,7 +7,7 @@ import {
 } from "@/components/dashboard/customer/customer-overview";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { getBookingData, getPaymentData } from "@/lib/Action/api/get.data.api";
+import { getBookingData, getPaymentData } from "@/lib/Action/api/customer/get";
 import { getDashboardSession } from "@/lib/dashboard-session";
 import type { CustomerBooking, CustomerPayment } from "@/types/type";
 

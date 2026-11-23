@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AdminServices } from "@/components/dashboard/admin/admin-services";
-import { getAdminServiceData } from "@/lib/Action/api/get.data.api";
+import { getAdminServiceData } from "@/lib/Action/api/admin/get";
 import { buildAdminServicesApiQuery } from "@/lib/admin-services-query";
 import { toTechnicianService } from "@/lib/service-mappers";
 import type { TechnicianService } from "@/types/type";

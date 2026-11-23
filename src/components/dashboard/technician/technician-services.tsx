@@ -53,11 +53,11 @@ import type {
   TechnicianService,
   TechnicianServicesProps,
 } from "@/types/type";
-import { deleteService } from "@/lib/Action/api/delete.data.api";
+import { deleteService } from "@/lib/Action/api/technician/delete";
 import {
   updateServiceAvailability,
   updateServiceData,
-} from "@/lib/Action/api/update.data.api";
+} from "@/lib/Action/api/technician/update";
 import { buildServiceFields } from "@/lib/service-payload";
 
 type ServiceCardProps = {

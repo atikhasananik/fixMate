@@ -10,7 +10,7 @@ import {
   getAdminServiceData,
   getAllPayments,
   getAllUsers,
-} from "@/lib/Action/api/get.data.api";
+} from "@/lib/Action/api/admin/get";
 import { getDashboardSession } from "@/lib/dashboard-session";
 import type {
   AdminBooking,

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/dashboard/shared/empty-state";
 import { FeaturedServicesSkeleton } from "@/components/home/featured-services-skeleton";
 import { ServiceCard } from "@/components/services/service-card";
-import { getFeaturedServiceData } from "@/lib/Action/api/get.data.api";
+import { getFeaturedServiceData } from "@/lib/Action/api/public/get";
 import { toTechnicianService } from "@/lib/service-mappers";
 import type { ServiceApiItem } from "@/types/type";
 

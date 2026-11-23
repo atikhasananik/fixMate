@@ -37,7 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import { createBookingRequest } from "@/lib/Action/api/post.booking.api";
+import { createBookingRequest } from "@/lib/Action/api/customer/post";
 import {
   getTodayDateInputValue,
   validateBookingRequest,

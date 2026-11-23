@@ -1,7 +1,5 @@
-import { IServiceData } from "@/types/type";
-
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_SERVER_API || "http://localhost:5000";
+import { BASE_URL } from "@/lib/Action/api/shared";
+import type { IServiceData } from "@/types/type";
 
 export const postServive = async (payload: IServiceData) => {
   const res = await fetch(`${BASE_URL}/add-service`, {

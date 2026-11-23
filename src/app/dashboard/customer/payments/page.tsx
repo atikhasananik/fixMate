@@ -5,7 +5,7 @@ import {
   CustomerPaymentsSkeleton,
 } from "@/components/dashboard/customer/customer-payments";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
-import { getPaymentData } from "@/lib/Action/api/get.data.api";
+import { getPaymentData } from "@/lib/Action/api/customer/get";
 import { getDashboardSession } from "@/lib/dashboard-session";
 import type { CustomerPayment } from "@/types/type";
 

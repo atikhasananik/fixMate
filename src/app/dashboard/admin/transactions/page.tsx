@@ -5,7 +5,7 @@ import {
   AdminTransactionsSkeleton,
 } from "@/components/dashboard/admin/admin-transactions";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
-import { getAllPayments } from "@/lib/Action/api/get.data.api";
+import { getAllPayments } from "@/lib/Action/api/admin/get";
 import type { PaymentApiDocument } from "@/types/type";
 
 export const metadata: Metadata = {

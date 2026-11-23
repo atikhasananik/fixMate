@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/dashboard/shared/empty-state";
 import { ServiceCard } from "@/components/services/service-card";
 import { ServicesToolbar } from "@/components/services/services-toolbar";
-import { getAllServiceData } from "@/lib/Action/api/get.data.api";
+import { getAllServiceData } from "@/lib/Action/api/public/get";
 import { toTechnicianService } from "@/lib/service-mappers";
 import {
   buildServiceApiQuery,

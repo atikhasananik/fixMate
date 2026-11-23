@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AdminUsers } from "@/components/dashboard/admin/admin-users";
-import { getAllUsers } from "@/lib/Action/api/get.data.api";
+import { getAllUsers } from "@/lib/Action/api/admin/get";
 import type { PlatformUser } from "@/types/type";
 
 export const metadata: Metadata = {

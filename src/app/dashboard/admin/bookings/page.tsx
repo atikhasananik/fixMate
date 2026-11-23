@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { AdminBookings } from "@/components/dashboard/admin/admin-bookings";
-import { getAdminBookingData } from "@/lib/Action/api/get.data.api";
+import { getAdminBookingData } from "@/lib/Action/api/admin/get";
 import { buildAdminBookingsApiQuery } from "@/lib/admin-bookings-query";
 import type { AdminBooking } from "@/types/type";
 

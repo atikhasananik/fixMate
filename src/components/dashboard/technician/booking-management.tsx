@@ -37,7 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/toast";
-import { updateBookingStatusByTechnician } from "@/lib/Action/api/update.data.api";
+import { updateBookingStatusByTechnician } from "@/lib/Action/api/technician/update";
 import {
   buildBookingsSearchParams,
   hasActiveBookingFilters,

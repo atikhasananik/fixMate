@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { ServiceThumbnail } from "@/components/dashboard/shared/service-thumbnail";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { getBookingById } from "@/lib/Action/api/get.data.api";
+import { getBookingById } from "@/lib/Action/api/customer/get";
 import type { CustomerBooking } from "@/types/type";
 import { PayNowButton } from "@/components/checkout/pay-now-button";
 import { notFound } from "next/navigation";

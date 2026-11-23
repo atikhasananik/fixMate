@@ -7,7 +7,7 @@ import { ServiceBookingCard } from "@/components/services/service-booking-card";
 import { ServiceDetailsHeader } from "@/components/services/service-details-header";
 import { ServiceInformation } from "@/components/services/service-information";
 import { TechnicianCard } from "@/components/services/technician-card";
-import { getSingleServiceData } from "@/lib/Action/api/get.data.api";
+import { getSingleServiceData } from "@/lib/Action/api/public/get";
 import { toServiceDetails } from "@/lib/service-mappers";
 import { notFound } from "next/navigation";
 

@@ -7,7 +7,7 @@ import {
 } from "@/components/dashboard/technician/technician-overview";
 import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
-import { getTechnicianBookingRequests } from "@/lib/Action/api/get.data.api";
+import { getTechnicianBookingRequests } from "@/lib/Action/api/technician/get";
 import { getDashboardSession } from "@/lib/dashboard-session";
 import type { TechnicianBooking } from "@/types/type";
 
