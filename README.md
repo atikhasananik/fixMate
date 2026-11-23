@@ -16,6 +16,12 @@ Browse trusted repair services, create bookings, manage technician requests, tra
 
 ---
 
+## Live Demo
+
+**Frontend:** [FixMate Live Website](https://fixmate-sand.vercel.app/)
+
+---
+
 ## Table of Contents
 
 - [Why FixMate?](#why-fixmate)
