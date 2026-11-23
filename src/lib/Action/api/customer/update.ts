@@ -1,4 +1,6 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+"use server";
+
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type { BookingStatus, UpdateBookingStatusResponse } from "@/types/type";
 
 // Updates a booking status (customer cancels a requested booking).
@@ -16,6 +18,7 @@ export const updateBookingStatus = async (
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify(payload),
   });

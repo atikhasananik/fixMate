@@ -1,6 +1,6 @@
 "use server";
 
-import { BASE_URL } from "@/lib/Action/api/shared";
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import { requireDashboardRole } from "@/lib/dashboard-session";
 import type {
   ServiceApprovalStatus,
@@ -18,6 +18,7 @@ export async function updateServiceApprovalStatus(
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify({ approvalStatus }),
   });
@@ -49,6 +50,7 @@ export async function updateUserRole(
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify({ email, role }),
   });

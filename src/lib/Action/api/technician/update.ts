@@ -1,4 +1,6 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+"use server";
+
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type { ServiceFields } from "@/lib/service-payload";
 import type {
   BookingStatus,
@@ -14,6 +16,7 @@ export const updateServiceData = async (
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify(updatedServiceData),
   });
@@ -33,6 +36,7 @@ export const updateServiceAvailability = async (
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify({ isAvailable }),
   });
@@ -70,6 +74,7 @@ export const updateBookingStatusByTechnician = async (
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify(payload),
   });

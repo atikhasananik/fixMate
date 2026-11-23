@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type {
   BookingApiDocument,
   BookingStatus,
@@ -79,7 +79,7 @@ export async function getBookingData(
 
   const res = await fetch(
     `${BASE_URL}/get-bookings/${encodeURIComponent(email)}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await getAuthHeaders() },
   );
   const data = (await res.json().catch(() => null)) as
     | GetBookingsResponse
@@ -113,7 +113,7 @@ export async function getBookingById(
 
   const res = await fetch(
     `${BASE_URL}/get-booking-by-id/${encodeURIComponent(id)}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await getAuthHeaders() },
   );
   const data = (await res.json().catch(() => null)) as
     | GetBookingByIdResponse
@@ -174,7 +174,7 @@ export async function getPaymentData(
 
   const res = await fetch(
     `${BASE_URL}/get-payment/${encodeURIComponent(email)}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await getAuthHeaders() },
   );
   const data = (await res.json().catch(() => null)) as
     | GetPaymentsResponse

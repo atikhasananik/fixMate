@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type {
   BookingStatus,
   GetTechnicianBookingRequestsResponse,
@@ -67,7 +67,7 @@ export async function getServiceData(
 ): Promise<ServiceApiItem[]> {
   const res = await fetch(
     `${BASE_URL}/get-services/${encodeURIComponent(technicianEmail)}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await getAuthHeaders() },
   );
 
   if (!res.ok) {
@@ -90,7 +90,7 @@ export async function getTechnicianBookingRequests(
   const suffix = queryString ? `?${queryString}` : "";
   const res = await fetch(
     `${BASE_URL}/get-booking-req/${encodeURIComponent(email)}${suffix}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await getAuthHeaders() },
   );
   const data = (await res.json().catch(() => null)) as
     | GetTechnicianBookingRequestsResponse

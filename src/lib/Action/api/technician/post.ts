@@ -1,4 +1,6 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+"use server";
+
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type { IServiceData } from "@/types/type";
 
 export const postServive = async (payload: IServiceData) => {
@@ -6,6 +8,7 @@ export const postServive = async (payload: IServiceData) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify(payload),
   });

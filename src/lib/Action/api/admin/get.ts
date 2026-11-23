@@ -1,4 +1,4 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type {
   AdminBooking,
   AdminBookingApiDocument,
@@ -40,7 +40,10 @@ export async function getAllUsers(): Promise<PlatformUser[]> {
     throw new Error("The service API is not configured.");
   }
 
-  const res = await fetch(`${BASE_URL}/get-all-users`, { cache: "no-store" });
+  const res = await fetch(`${BASE_URL}/get-all-users`, {
+    cache: "no-store",
+    headers: await getAuthHeaders(),
+  });
   const data = (await res.json().catch(() => null)) as GetUsersResponse | null;
 
   if (!res.ok) {
@@ -61,7 +64,7 @@ export async function getAdminServiceData(
   const suffix = queryString ? `?${queryString}` : "";
   const res = await fetch(
     `${BASE_URL}/get-all-services-by-admin${suffix}`,
-    { cache: "no-store" },
+    { cache: "no-store", headers: await getAuthHeaders() },
   );
 
   if (!res.ok) {
@@ -126,6 +129,7 @@ export async function getAdminBookingData(
   const suffix = queryString ? `?${queryString}` : "";
   const res = await fetch(`${BASE_URL}/get-bookings-by-admin${suffix}`, {
     cache: "no-store",
+    headers: await getAuthHeaders(),
   });
   const data = (await res.json().catch(() => null)) as
     | GetAdminBookingsResponse
@@ -147,7 +151,10 @@ export async function getAllPayments(): Promise<PaymentApiDocument[]> {
     throw new Error("The service API is not configured.");
   }
 
-  const res = await fetch(`${BASE_URL}/get-payments`, { cache: "no-store" });
+  const res = await fetch(`${BASE_URL}/get-payments`, {
+    cache: "no-store",
+    headers: await getAuthHeaders(),
+  });
   const data = (await res.json().catch(() => null)) as
     | GetPaymentsResponse
     | PaymentApiDocument[]

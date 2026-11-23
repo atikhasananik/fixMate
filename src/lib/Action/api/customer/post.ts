@@ -1,4 +1,6 @@
-import { BASE_URL } from "@/lib/Action/api/shared";
+"use server";
+
+import { BASE_URL, getAuthHeaders } from "@/lib/Action/api/shared";
 import type {
   BookingData,
   CreateBookingResponse,
@@ -16,6 +18,7 @@ export async function createBookingRequest(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify(payload),
   });
@@ -51,6 +54,7 @@ export async function createPaymentIntent(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(await getAuthHeaders()),
     },
     body: JSON.stringify(payload),
   });
