@@ -1,6 +1,6 @@
 import {
-  BadgeCheck,
   CalendarCheck,
+  CircleCheck,
   ClipboardList,
   CreditCard,
   HardHat,
@@ -18,6 +18,7 @@ import type {
   ServiceApprovalStatus,
   ServiceListing,
   ServiceMode,
+  TechnicianBooking,
 } from "@/types/type";
 import { formatMoney } from "@/lib/format";
 
@@ -353,29 +354,35 @@ export function getCustomerStats(
 }
 
 export function getTechnicianStats(
-  services: ServiceListing[],
-  bookings: Booking[],
+  bookings: Pick<TechnicianBooking, "status">[],
 ): DashboardStat[] {
   return [
     {
-      label: "Total services",
-      value: services.length,
-      icon: Wrench,
-      hint: "Listings you have created",
+      label: "Total assigned jobs",
+      value: bookings.length,
+      icon: ClipboardList,
+      hint: "Every repair request assigned to you",
     },
     {
-      label: "Approved services",
-      value: services.filter((service) => service.approvalStatus === "approved")
-        .length,
-      icon: BadgeCheck,
-      hint: "Visible on the public services page",
-    },
-    {
-      label: "Pending requests",
-      value: bookings.filter((booking) => booking.status === "requested")
-        .length,
+      label: "Pending jobs",
+      value: bookings.filter((booking) => booking.status === "requested").length,
       icon: Inbox,
-      hint: "Repair requests waiting for a technician",
+      hint: "New requests waiting for your response",
+    },
+    {
+      label: "In progress jobs",
+      value: bookings.filter(
+        (booking) =>
+          booking.status === "accepted" || booking.status === "in-progress",
+      ).length,
+      icon: Wrench,
+      hint: "Accepted or currently being repaired",
+    },
+    {
+      label: "Completed jobs",
+      value: bookings.filter((booking) => booking.status === "completed").length,
+      icon: CircleCheck,
+      hint: "Repairs you have finished",
     },
   ];
 }
