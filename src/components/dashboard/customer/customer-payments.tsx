@@ -20,7 +20,7 @@ import {
 import { EmptyState } from "@/components/dashboard/shared/empty-state";
 import { StatusBadge } from "@/components/dashboard/shared/status-badge";
 import { TableCard } from "@/components/dashboard/shared/table-card";
-import { formatCurrency, formatDate } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 import type {
   CustomerPayment,
   CustomerPaymentsProps,
@@ -50,19 +50,6 @@ function PaymentBadge({ status }: { status: PaymentRecordStatus }) {
       {OTHER_PAYMENT_LABELS[status]}
     </Badge>
   );
-}
-
-/** Uses the payment's own currency and keeps cents when Stripe sends them. */
-function formatPaymentAmount(amount: number, currency: string) {
-  try {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.toUpperCase(),
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch {
-    return formatCurrency(amount);
-  }
 }
 
 /** Older payments have no `serviceTitle`; fall back to the booking reference. */
@@ -123,7 +110,7 @@ export function CustomerPayments({ payments, error }: CustomerPaymentsProps) {
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-2">
                     <span className="text-base font-semibold tabular-nums">
-                      {formatPaymentAmount(payment.amount, payment.currency)}
+                      {formatMoney(payment.amount, payment.currency)}
                     </span>
                     <PaymentBadge status={payment.status} />
                   </div>
@@ -191,7 +178,7 @@ export function CustomerPayments({ payments, error }: CustomerPaymentsProps) {
                       </div>
                     </TableCell>
                     <TableCell className="whitespace-nowrap font-medium tabular-nums">
-                      {formatPaymentAmount(payment.amount, payment.currency)}
+                      {formatMoney(payment.amount, payment.currency)}
                     </TableCell>
                     <TableCell>
                       <PaymentBadge status={payment.status} />

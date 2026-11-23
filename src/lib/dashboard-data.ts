@@ -2,6 +2,7 @@ import {
   BadgeCheck,
   CalendarCheck,
   ClipboardList,
+  CreditCard,
   HardHat,
   Inbox,
   ShieldCheck,
@@ -10,6 +11,7 @@ import {
 import type {
   Booking,
   BookingStatus,
+  CustomerPayment,
   DashboardStat,
   IServiceData,
   PlatformUser,
@@ -17,6 +19,7 @@ import type {
   ServiceListing,
   ServiceMode,
 } from "@/types/type";
+import { formatMoney } from "@/lib/format";
 
 export const SERVICE_CATEGORIES: readonly IServiceData["category"][] = [
   "Smartphone",
@@ -303,16 +306,27 @@ export const SAMPLE_BOOKINGS: Booking[] = [
   },
 ];
 
-export function getCustomerStats(bookings: Booking[]): DashboardStat[] {
+export function getCustomerStats(
+  bookings: Pick<Booking, "status">[],
+  payments: Pick<CustomerPayment, "amount" | "status">[],
+): DashboardStat[] {
+  const paidPayments = payments.filter(
+    (payment) => payment.status === "paid",
+  );
+  const totalPaid = paidPayments.reduce(
+    (sum, payment) => sum + payment.amount,
+    0,
+  );
+
   return [
     {
-      label: "Total requests",
+      label: "Total bookings",
       value: bookings.length,
       icon: ClipboardList,
       hint: "Every repair request you have sent",
     },
     {
-      label: "Active jobs",
+      label: "Active bookings",
       value: bookings.filter(
         (booking) =>
           booking.status === "accepted" || booking.status === "in-progress",
@@ -321,11 +335,19 @@ export function getCustomerStats(bookings: Booking[]): DashboardStat[] {
       hint: "Accepted or currently being repaired",
     },
     {
-      label: "Completed jobs",
-      value: bookings.filter((booking) => booking.status === "completed")
-        .length,
+      label: "Completed bookings",
+      value: bookings.filter((booking) => booking.status === "completed").length,
       icon: CalendarCheck,
       hint: "Finished repairs, paid or awaiting payment",
+    },
+    {
+      label: "Total payments",
+      value: paidPayments.length,
+      icon: CreditCard,
+      hint:
+        paidPayments.length > 0
+          ? `${formatMoney(totalPaid)} paid in total`
+          : "No completed payments yet",
     },
   ];
 }
