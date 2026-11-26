@@ -1,10 +1,13 @@
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { isGoogleAuthEnabled } from "@/lib/auth-providers";
+import { getMongoClient } from "@/lib/mongodb";
 import { jwt } from "better-auth/plugins";
 
-const client = new MongoClient(process.env.MONGODB_URI as string);
+// One connected client per serverless instance, cached in `lib/mongodb.ts`.
+// Awaiting it here means a failed cold-start connection fails the instance
+// instead of leaving it serving "Topology is closed" for its whole lifetime.
+const client = await getMongoClient();
 const db = client.db("fixMate");
 
 export const auth = betterAuth({
